@@ -1,5 +1,7 @@
 #include <string>
 #include <time.h>
+#include <vector>
+#include "timecalc.h"
 
 int day, hour, minute;
 
@@ -12,3 +14,5 @@ void get_time()
 	hour = time_struct->tm_hour;
 	minute = time_struct->tm_min;
 }
+
+std::vector < std::string > weekdays = { "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday" };

@@ -10,3 +10,5 @@ struct lesson
 };
 
 extern std::vector < std::vector < struct lesson > > table;
+
+void show_lesson(int, int);
