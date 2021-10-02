@@ -1,5 +1,7 @@
 #include <vector>
 #include <string>
+#include "lesson.h"
+#include "timecalc.h"
 
 int vecstrcmp(const char* string, std::vector < std::string > string_vec)
 {
@@ -11,4 +13,14 @@ int vecstrcmp(const char* string, std::vector < std::string > string_vec)
 		}
 	}
 	return -1;
+}
+
+int check_timeframe_availability()
+{
+	for (int i = 0; i<weekdays.size(); i++)
+	{
+		if (timeframes.size() < table[i].size())
+			return -1;
+	}
+	return 0;
 }
