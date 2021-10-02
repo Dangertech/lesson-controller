@@ -19,11 +19,11 @@ int main(int argc, char *argv[])
 	 
 	// Get if an argument is a weekday and store the weekday_id
 	int weekday_check = vecstrcmp(argv[1], weekdays);
-
+	 
 	// Execute actions based on arguments
 	// Currently only incorporates the first argument, 
 	// needs to be loop for all in the future
-	if (weekday_check != -1)
+	if (weekday_check != -1) // Show timetable of given weekday
 	{
 		std::cout << "--- " << weekdays[weekday_check] << " ---" << std::endl;
 		if (table[weekday_check].size() == 0)
@@ -34,11 +34,13 @@ int main(int argc, char *argv[])
 		}
 	}
 	else if (strncmp(argv[1], "+", 1) == 0 || strncmp(argv[1], "-", 1) == 0)
-	{
+	{ // Show +n lessons
 		int to_skip = atoi(argv[1]);
 		std::cout << to_skip << std::endl;
+		int current_lesson = get_lesson(hour, minute);
+		std::cout << "Current lesson: " << current_lesson << std::endl;
 	}
-	else if (strcmp(argv[1], "time") == 0) //Only meant for debug
+	else if (strcmp(argv[1], "time") == 0) // Only meant for debug
 		std::cout << "Current time: " << hour << ":" << minute << std::endl;
 	else
 		std::cout << "Invalid argument '" << argv[1] << "'" << std::endl;

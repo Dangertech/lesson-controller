@@ -14,3 +14,5 @@ extern std::vector < std::pair<int, int> > timeframes; // The times at which les
 extern std::vector < std::vector < struct lesson > > table; // The timetable, a vector of a vector of lessons
 
 void show_lesson(int, int);
+
+int get_lesson(int, int); // Get the lesson at the given time (int, int)
