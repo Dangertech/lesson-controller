@@ -70,53 +70,60 @@ void show_single_day (int my_day)
 	}
 	if (table[my_day].size() == 0 && terse == false)
 		std::cout << "No lessons registered" << std::endl;
-	for (int i = 0; i < table[my_day].size(); i++)
-	{
-		show_lesson(my_day, i);
-	}
+	 
+	std::vector < std::pair <int,int> > day_vector;
+	for (int i = 0; i<table[my_day].size(); i++)
+		day_vector.push_back( std::make_pair(my_day, i));
+	show_lessons(day_vector);
 }
 
-void show_lesson(int day, int lesson) // Show data for a specific lesson
+void show_lessons(std::vector < std::pair<int, int> > to_show) // Show data for a specific lesson
 {
-	// Can easily be expanded to only show specific data or make output terse
-	if (day < table.size() && lesson < table[day].size())
+	for (int i = 0; i < to_show.size(); i++)
 	{
-		// Show time
-		if (terse == false)
-			std::cout << "[";
-		if (timeframes[lesson].first != 0) // Check to warn if the timeframe doesn't exist
-			std::cout << timeframes[lesson].first;
+		int day = to_show[i].first;
+		int lesson = to_show[i].second;
+		 
+		if (to_show[i].first < table.size() && to_show[i].second < table[day].size()) // Check to avoid crashes
+		{
+			// Show time
+			if (terse == false)
+				std::cout << "[";
+			if (timeframes[lesson].first != 0) // Check to warn if the timeframe doesn't exist
+				std::cout << timeframes[lesson].first;
+			else
+				std::cout << "\033[1;31m" << "!" << "\033[0m";
+			std::cout << ":";
+			if (timeframes[lesson].second != 0)
+				std::cout << timeframes[lesson].second;
+			else
+				std::cout << "\033[1;31m" << "!" << "\033[0m";
+			if (terse == false)
+				std::cout << "] "; 
+			else
+				std::cout << "/";
+			 
+			std::cout << table[day][lesson].subject;
+			if (terse == false)
+				std::cout << " ";
+			else
+				std::cout << "/";
+			std::cout << table[day][lesson].teacher;
+			if (terse == false)
+				std::cout << " ";
+			else
+				std::cout << "/";
+			std::cout << table[day][lesson].room;
+			std::cout << std::endl;
+		}
 		else
-			std::cout << "\033[1;31m" << "!" << "\033[0m";
-		std::cout << ":";
-		if (timeframes[lesson].second != 0)
-			std::cout << timeframes[lesson].second;
-		else
-			std::cout << "\033[1;31m" << "!" << "\033[0m";
-		if (terse == false)
-			std::cout << "] "; 
-		else
-			std::cout << "/";
-		std::cout << table[day][lesson].subject;
-		if (terse == false)
-			std::cout << " ";
-		else
-			std::cout << "/";
-		std::cout << table[day][lesson].teacher;
-		if (terse == false)
-			std::cout << " ";
-		else
-			std::cout << "/";
-		std::cout << table[day][lesson].room;
-		std::cout << std::endl;
-	}
-	else
-	{
-		std::cout << "Lesson " << lesson << " on weekday " <<  weekdays[day] << " does not exist!" << std::endl;
+		{
+			std::cout << "Lesson " << lesson << " on weekday " <<  weekdays[day] << " does not exist!" << std::endl;
+		}
 	}
 }
 
-int get_lesson(int c_hour, int c_minute)
+int get_lesson(int c_hour, int c_minute) // Get the current lesson
 {
 	// Converts time to minutes in this day
 	// Maybe timeframes should be like that out of the box?

@@ -38,7 +38,15 @@ void rel_lesson(int to_skip)
 	if (current_lesson == -1)
 		targeted_lesson = 0;
 	else if (current_lesson == -2)
-		targeted_lesson = timeframes.size() - 2; 
+	{
+		if (to_skip == 0)
+		{
+			if (terse == false)
+				std::cout << "No active lesson registered." << std::endl;
+			return;
+		}
+		targeted_lesson = timeframes.size() - 1; 
+	}
 	else
 		targeted_lesson = current_lesson;
 	int targeted_day = day; // Day of timecalc.cpp
@@ -49,7 +57,7 @@ void rel_lesson(int to_skip)
 		for (int i = 0; i<to_skip; i++)
 		{
 			targeted_lesson++;
-			if (targeted_lesson > timeframes.size() - 1)
+			if (targeted_lesson >= timeframes.size() - 1)
 			{
 				targeted_day++;
 				targeted_lesson = 0;
@@ -79,5 +87,5 @@ void rel_lesson(int to_skip)
 			  << " on "
 			  << weekdays[targeted_day] << ":" << std::endl;
 	 
-	show_lesson(targeted_day, targeted_lesson);
+	show_lessons({ {targeted_day, targeted_lesson } });
 }

@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 	for (int my_arg = 1; my_arg < argc; my_arg++)
 	{
 		// Get if an argument is a weekday and store the weekday_id
-		int weekday_check = vecstrcmp(argv[my_arg], weekdays);
+		int weekday_check = vecstrcmp(argv[my_arg], weekdays); // Get the responding array entry for the given argument, -1 if nothing corresponds
 		 
 		// Execute actions based on arguments
 		// Currently only incorporates the first argument, 
@@ -47,6 +47,7 @@ int main(int argc, char *argv[])
 			show_single_day(weekday_check);
 		 
 		 
+		// Show relative lesson (+1/+3/-5/+0)
 		else if (strncmp(argv[my_arg], "+", 1) == 0 || strncmp(argv[my_arg], "-", 1) == 0)
 		{
 			if (isdigit(argv[my_arg][1]) != 0) // Don't pass other "-" arguments

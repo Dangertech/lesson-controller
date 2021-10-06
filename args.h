@@ -1,3 +1,4 @@
+// Functions and variables that control the given arguments
 #pragma once
 
 int vecstrcmp (const char* string, std::vector <std::string>);
