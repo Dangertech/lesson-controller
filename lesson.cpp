@@ -60,6 +60,22 @@ std::vector < std::vector < struct lesson > > table =
 
 std::vector < std::pair<int, int> > timeframes = { {7, 45}, {8, 35}, {9, 35}, {10, 25}, {11, 25}, {12, 10}, {12, 55} };
 
+void show_single_day (int my_day)
+{
+	if (terse == false) // Show the requested weekday in a fancy format
+	{
+		std::string my_weekday = weekdays[my_day];
+		my_weekday[0] = toupper(my_weekday[0]);
+		std::cout << "--- " << my_weekday << " ---" << std::endl;
+	}
+	if (table[my_day].size() == 0 && terse == false)
+		std::cout << "No lessons registered" << std::endl;
+	for (int i = 0; i < table[my_day].size(); i++)
+	{
+		show_lesson(my_day, i);
+	}
+}
+
 void show_lesson(int day, int lesson) // Show data for a specific lesson
 {
 	// Can easily be expanded to only show specific data or make output terse
