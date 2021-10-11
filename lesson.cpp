@@ -73,16 +73,59 @@ void show_single_day (int my_day)
 	 
 	std::vector < std::pair <int,int> > day_vector;
 	for (int i = 0; i<table[my_day].size(); i++)
-		day_vector.push_back( std::make_pair(my_day, i));
+	{
+		day_vector.push_back( std::make_pair(my_day, i) );
+		if (i < table[my_day].size() -1)
+			day_vector.push_back( std::make_pair(-1, -1) );
+	}
 	show_lessons(day_vector);
+}
+
+int time_size = 8, subj_size, teach_size, room_size;
+
+void terse_space() // [Internal only], used for show_lessons
+{
+	if (terse == false)
+	{
+		std::cout << " | ";
+	}
+	else
+		std::cout << "/";
 }
 
 void show_lessons(std::vector < std::pair<int, int> > to_show) // Show data for a specific lesson
 {
+	// Get how big the table cells should be
 	for (int i = 0; i < to_show.size(); i++)
 	{
 		int day = to_show[i].first;
 		int lesson = to_show[i].second;
+		if (day == -1 || lesson == -1)
+			continue;
+		if (subj_size < table[day][lesson].subject.length())
+			subj_size = table[day][lesson].subject.length();
+		if (teach_size < table[day][lesson].teacher.length())
+			teach_size = table[day][lesson].teacher.length();
+	}
+	 
+	bool construct = true;
+	for (int i = 0; i < to_show.size(); i++)
+	{
+		 
+		int day = to_show[i].first;
+		int lesson = to_show[i].second;
+		 
+		if (day == -1 && lesson == -1)
+		{
+			std::cout << std::endl;
+			construct = false;
+			continue;
+		}
+		 
+		if (construct && !terse)
+		{
+			std::cout << "TIME" << std::endl;
+		}
 		 
 		if (to_show[i].first < table.size() && to_show[i].second < table[day].size()) // Check to avoid crashes
 		{
@@ -104,23 +147,17 @@ void show_lessons(std::vector < std::pair<int, int> > to_show) // Show data for 
 				std::cout << "/";
 			 
 			std::cout << table[day][lesson].subject;
-			if (terse == false)
-				std::cout << " ";
-			else
-				std::cout << "/";
+			terse_space();
 			std::cout << table[day][lesson].teacher;
-			if (terse == false)
-				std::cout << " ";
-			else
-				std::cout << "/";
+			terse_space();
 			std::cout << table[day][lesson].room;
-			std::cout << std::endl;
 		}
 		else
 		{
 			std::cout << "Lesson " << lesson << " on weekday " <<  weekdays[day] << " does not exist!" << std::endl;
 		}
 	}
+	std::cout << std::endl; // Enforce break after the last lesson is printed
 }
 
 int get_lesson(int c_hour, int c_minute) // Get the current lesson

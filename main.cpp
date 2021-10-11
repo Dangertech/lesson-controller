@@ -31,6 +31,12 @@ int main(int argc, char *argv[])
 		std::cout << "\033[0m"; // Stop making text red
 	}
 	 
+	// If there are no arguments, show the week and exit
+	if (argc == 1)
+	{
+		show_week();
+		return 0;
+	}
 	
 	///// Execute arguments
 	 

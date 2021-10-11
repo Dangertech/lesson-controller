@@ -89,3 +89,8 @@ void rel_lesson(int to_skip)
 	 
 	show_lessons({ {targeted_day, targeted_lesson } });
 }
+
+void show_week()
+{
+	std::cout << "Ima show you the week!" << std::endl;
+}
