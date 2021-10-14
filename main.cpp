@@ -10,6 +10,7 @@
 
 int main(int argc, char *argv[])
 {
+	 
 	get_time();
 	
 	///// Get config arguments
@@ -49,7 +50,7 @@ int main(int argc, char *argv[])
 		// Currently only incorporates the first argument, 
 		// needs to be loop for all in the future
 		
-		if (weekday_check != -1) // Show timetable of given weekday
+		if (weekday_check != ERROR) // Show timetable of given weekday
 			show_single_day(weekday_check);
 		 
 		 

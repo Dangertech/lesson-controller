@@ -4,8 +4,8 @@
 #include <string>
 #include "lesson.h"
 #include "timecalc.h"
+#include "args.h"
 
-#define ERROR -666
 
 bool terse = false;
 bool count_empties = true;
