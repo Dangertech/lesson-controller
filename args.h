@@ -1,5 +1,13 @@
 // Functions and variables that control the given arguments
+// Also a utility dump
 #pragma once
+
+// UTILITIES
+
+int int_length(int);
+
+
+// ARGUMENT PROCESSING
 
 int vecstrcmp (const char* string, std::vector <std::string>);
 

@@ -5,8 +5,31 @@
 #include "lesson.h"
 #include "timecalc.h"
 
+#define ERROR -666
+
 bool terse = false;
 bool count_empties = true;
+
+
+// There might very well be an inbuilt solution but I don't care enough to google it
+int int_length (int integer) // That do be a lot of ints
+{
+	if (integer < 0 && integer > -10)
+		return 2;
+	if (integer > 0 && integer < 10)
+		return 1;
+	if (integer > 9 && integer < 100)
+		return 2;
+	if (integer > 99 && integer < 1000)
+		return 3;
+	if (integer > 999 && integer < 10000)
+		return 4;
+	return ERROR;
+}
+
+
+
+//// ARGUMENTS PROCESSING
 
 int vecstrcmp(const char* string, std::vector < std::string > string_vec)
 {
@@ -17,7 +40,7 @@ int vecstrcmp(const char* string, std::vector < std::string > string_vec)
 			return i;
 		}
 	}
-	return -1;
+	return ERROR;
 }
 
 int check_timeframe_availability()
