@@ -11,10 +11,17 @@ extern bool count_empties; // Should empty lessons in the timetable be counted w
 
 #define ERROR -666 // General error value
 
+#define C_RED_B		"\033[1;31m"
+#define C_GREEN_U	"\033[4;32m"
+#define C_BLUE		"\033[34m"
+#define C_BLUE_U	"\033[4;34m"
+#define C_OFF		"\033[0m"
+
 int int_length(int);
 
 int vecstrcmp (const char* string, std::vector <std::string>);
 
+std::string cap(std::string); // Capitalize the first letter in a string
 
 // ARGUMENT PROCESSING
 

@@ -104,7 +104,7 @@ void terse_space(int custom_spaces) // [Internal only], used for show_lessons
 		// Make spaces according to the input argument given
 		print_chars(" ", custom_spaces);
 		x_pos += custom_spaces;
-		std::cout << "|";
+		std::cout << C_BLUE << "|" << C_OFF;
 		x_pos++;
 		// Make spacing spaces
 		print_chars(" ",spacing);
@@ -112,6 +112,52 @@ void terse_space(int custom_spaces) // [Internal only], used for show_lessons
 	}
 	else
 		std::cout << "/";
+}
+
+void print_header()
+{
+	x_pos = 0;
+	// Store the x position where the table headers should start
+	// Just to make my head hurt less
+	int des_pos; 
+	
+	// Blue color underlined
+	std::cout << C_BLUE_U;
+	 
+	std::cout << "=TIME";
+	x_pos += 5;
+	 
+	des_pos = time_size+spacing;
+	 
+	print_chars("=", des_pos-x_pos-1);
+	x_pos += des_pos-x_pos-1;
+	 
+	std::cout << "SUBJECT";
+	x_pos += 7;
+	
+	des_pos = time_size+spacing+subj_size+spacing+1+spacing;
+	 
+	print_chars("=", des_pos - x_pos - 1);
+	x_pos += des_pos - x_pos - 1;
+	 
+	std::cout << "TEACHER";
+	x_pos += 7;
+	 
+	des_pos += teach_size + spacing + 1 + spacing;
+	 
+	print_chars("=", des_pos - x_pos - 1);
+	x_pos += des_pos - x_pos - 1;
+	 
+	std::cout << "ROOM";
+	x_pos += 4;
+	 
+	des_pos += room_size;
+	print_chars("=", des_pos - x_pos - 1);
+	 
+	std::cout << std::endl;
+	x_pos = 0;
+	
+	std::cout << C_OFF;
 }
 
 // Show data for any lessons
@@ -152,56 +198,17 @@ void show_lessons(std::vector < std::pair<int, int> > to_show)
 			continue;
 		}
 		 
-		// Make the header of the table (only if terse is false of course)
-		if (construct && !terse)
-		{
-			x_pos = 0;
-			// Store the x position where the table headers should start
-			// Just to make my head hurt less
-			int des_pos; 
-			
-			// Blue color
-			std::cout << "\033[4;34m";
-			 
-			std::cout << "=TIME";
-			x_pos += 5;
-			 
-			des_pos = time_size+spacing;
-			 
-			print_chars("=", des_pos-x_pos-1);
-			x_pos += des_pos-x_pos-1;
-			 
-			std::cout << "SUBJECT";
-			x_pos += 7;
-			
-			des_pos = time_size+spacing+subj_size+spacing+1+spacing;
-			 
-			print_chars("=", des_pos - x_pos - 1);
-			x_pos += des_pos - x_pos - 1;
-			 
-			std::cout << "TEACHER";
-			x_pos += 7;
-			 
-			des_pos += teach_size + spacing + 1 + spacing;
-			 
-			print_chars("=", des_pos - x_pos - 1);
-			x_pos += des_pos - x_pos - 1;
-			 
-			std::cout << "ROOM";
-			x_pos += 4;
-			 
-			des_pos += room_size;
-			print_chars("=", des_pos - x_pos - 1);
-			 
-			std::cout << std::endl;
-			x_pos = 0;
-			
-			std::cout << "\033[0m";
-		}
 		 
 		 
 		if (to_show[i].first < table.size() && to_show[i].second < table[day].size()) // Check to avoid crashes
 		{
+			// Make the header of the table (only if terse is false of course)
+			if (construct && !terse)
+			{
+				print_header();
+			}
+			 
+			 
 			// Show time
 			if (terse == false)
 			{
@@ -215,7 +222,7 @@ void show_lessons(std::vector < std::pair<int, int> > to_show)
 			}
 			else
 			{
-				std::cout << "\033[1;31m" << "!" << "\033[0m";
+				std::cout << C_RED_B << "!" << C_OFF;
 				x_pos++;
 			}
 			 
@@ -228,7 +235,7 @@ void show_lessons(std::vector < std::pair<int, int> > to_show)
 			}
 			else
 			{
-				std::cout << "\033[1;31m" << "!" << "\033[0m";
+				std::cout << C_RED_B << "!" << C_OFF;
 				x_pos++;
 			}
 			 
@@ -247,6 +254,7 @@ void show_lessons(std::vector < std::pair<int, int> > to_show)
 				std::cout << "/";
 				x_pos++;
 			}
+			// Time end 
 			 
 			 
 			std::cout << table[day][lesson].subject;
@@ -262,13 +270,17 @@ void show_lessons(std::vector < std::pair<int, int> > to_show)
 			 
 			std::cout << table[day][lesson].room;
 			x_pos += table[day][lesson].room.size();
+			 
+			// Enforce break after the last lesson is printed
+			if (i == to_show.size() - 1)
+				std::cout << std::endl; 
 		}
-		else
+		else if (!terse)
 		{
-			std::cout << "Lesson " << lesson << " on weekday " <<  weekdays[day] << " does not exist!" << std::endl;
+			std::cout << "Lesson " << lesson+1 << " on weekday " 
+				  <<  cap(weekdays[day]) << " does not exist!" << std::endl;
 		}
 	}
-	std::cout << std::endl; // Enforce break after the last lesson is printed
 }
 
 int get_lesson(int c_hour, int c_minute) // Get the current lesson

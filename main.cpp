@@ -27,9 +27,9 @@ int main(int argc, char *argv[])
 	 
 	if (check_timeframe_availability() == -1) // Check if there are enough timeframes to match all lessons
 	{					  // issue a warning if not
-		std::cout << "\033[1;31m"; // Start making text red
+		std::cout << C_RED_B; // Start making text red
 		std::cout << "Warning: There isn't a timeframe for every lesson in the timetable" << std::endl;
-		std::cout << "\033[0m"; // Stop making text red
+		std::cout << C_OFF; // Stop making text red
 	}
 	 
 	// If there are no arguments, show the week and exit

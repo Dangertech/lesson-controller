@@ -27,10 +27,6 @@ int int_length (int integer) // That do be a lot of ints
 	return ERROR;
 }
 
-
-
-//// ARGUMENTS PROCESSING
-
 int vecstrcmp(const char* string, std::vector < std::string > string_vec)
 {
 	for (int i = 0; i < string_vec.size(); i++)
@@ -42,6 +38,14 @@ int vecstrcmp(const char* string, std::vector < std::string > string_vec)
 	}
 	return ERROR;
 }
+
+std::string cap(std::string to_cap)
+{
+	to_cap[0] = toupper(to_cap[0]);
+	return to_cap;
+}
+
+//// ARGUMENTS PROCESSING
 
 int check_timeframe_availability()
 {
@@ -108,12 +112,15 @@ void rel_lesson(int to_skip)
 	if (terse == false) // Print out the lesson if terse is false
 		std::cout << "Lesson " << targeted_lesson + 1 
 			  << " on "
-			  << weekdays[targeted_day] << ":" << std::endl;
+			  << cap(weekdays[targeted_day]) << ":" << std::endl;
 	 
 	show_lessons({ {targeted_day, targeted_lesson } });
 }
 
 void show_week()
 {
-	std::cout << "Ima show you the week!" << std::endl;
+	std::cout << "Instead of this text, the whole week will be shown later on" << std::endl
+		  << "Meanwhile, you can do '" << C_GREEN_U 
+		  << "lesson monday tuesday wednesday thursday friday" << C_OFF << "'"
+		  << "to have a substitute." << std::endl;
 }
