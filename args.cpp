@@ -45,6 +45,17 @@ std::string cap(std::string to_cap)
 	return to_cap;
 }
 
+std::string tabs(int tab_num)
+{
+	std::string tabs_to_give;
+	for (int i = 0; i<tab_num; i++)
+	{
+		tabs_to_give += "\t";
+	}
+	return tabs_to_give;
+}
+
+
 //// ARGUMENTS PROCESSING
 
 int check_timeframe_availability()

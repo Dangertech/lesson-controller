@@ -1,5 +1,6 @@
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include "lesson.h"
 #include "timecalc.h"
 #include "args.h"
@@ -301,4 +302,66 @@ int get_lesson(int c_hour, int c_minute) // Get the current lesson
 		return -1; // Before today's lessons
 	else
 		return -2; // After today's lessons
+}
+
+
+/////////////// Data reading and writing
+
+std::string file_loc = "lessondata.dat";
+
+int read_table()
+{
+	// Space - and linebreak agnostic function that reads in the lessondata
+	return 0;
+}
+
+int write_table()
+{
+	// This function should create a human readable file with the table data in it
+	 
+	std::ofstream outfile(file_loc); // Open file stream
+	
+	///// Writing a little help text
+	outfile << "# This is the location where the data about your lessons is stored." << std::endl
+		<< "# It is designed to be human readable so that you can easily edit it," << std::endl
+		<< "# but note that in the future, there are plans to have arguments that let you edit your lessons with lesson-controller itself." << std::endl
+	 
+	///// Writing the timeframes
+	 
+	outfile << "{ # The minutes your lessons start every day" << std::endl;
+	outfile << tabs(1);
+	for (int stamp = 0; stamp < timeframes.size(); stamp++)
+	{
+		outfile << "{"
+			<< timeframes[stamp].first << ":"
+			<< timeframes[stamp].second << "} ";
+	}
+	outfile << std::endl << "}" << std::endl << std::endl;
+	 
+	 
+	///// Writing the timetable
+	 
+	outfile << "{ # Your timetable" << std::endl;
+	outfile << tabs(1) << " " << std::endl;
+	for (int iday = 0; iday<table.size(); iday++)
+	{
+		outfile << tabs(1) << "{" << " # " << cap(weekdays[iday]) <<  std::endl;
+		if (table[iday].size() > 0)
+		{
+			for (int ilesson = 0; ilesson<table[iday].size(); ilesson++)
+			{
+				outfile << tabs(2) << "{ ";
+				outfile << table[iday][ilesson].subject << ", "
+					<< table[iday][ilesson].teacher << ", "
+					<< table[iday][ilesson].room;
+				outfile << " }" << std::endl;
+			}
+		}
+		else
+			outfile << tabs(2) << " " << std::endl;
+		outfile << tabs(1) << "}" << std::endl
+			<< tabs(1) << std::endl;
+	}
+	outfile << "}" << std::endl;
+	return 0;
 }

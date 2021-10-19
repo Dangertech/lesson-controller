@@ -23,6 +23,8 @@ int vecstrcmp (const char* string, std::vector <std::string>);
 
 std::string cap(std::string); // Capitalize the first letter in a string
 
+std::string tabs(int); // Give a number of tabs
+
 // ARGUMENT PROCESSING
 
 int check_timeframe_availability(); // Best name, I know

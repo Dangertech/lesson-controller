@@ -11,7 +11,8 @@
 int main(int argc, char *argv[])
 {
 	 
-	get_time();
+	get_time(); // Get the current time and write it into the variables
+	read_table(); // Read the table from the file specified in lesson.h
 	
 	///// Get config arguments
 	 
@@ -70,6 +71,8 @@ int main(int argc, char *argv[])
 		else
 			std::cout << "Invalid argument '" << argv[my_arg] << "'" << std::endl;
 	}
+	 
+	write_table();
 	 
 	return 0;
 }
