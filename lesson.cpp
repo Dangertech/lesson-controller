@@ -6,7 +6,7 @@
 #include "args.h"
 
 
-std::vector < std::vector < struct lesson > > table = 
+std::vector < std::vector < struct lesson > > table =
 { 
 	{ // Sunday
 	},
@@ -59,7 +59,7 @@ std::vector < std::vector < struct lesson > > table =
 	} 
 };
 
-std::vector < std::pair<int, int> > timeframes = { {7, 45}, {8, 35}, {9, 35}, {10, 25}, {11, 25}, {12, 10}, {12, 55} };
+std::vector < std::pair<int, int> > timeframes; //{ {7, 45}, {8, 35}, {9, 35}, {10, 25}, {11, 25}, {12, 10}, {12, 55} };
 
 void show_single_day (int my_day)
 {
@@ -307,61 +307,128 @@ int get_lesson(int c_hour, int c_minute) // Get the current lesson
 
 /////////////// Data reading and writing
 
-std::string file_loc = "lessondata.dat";
+const std::string DIR_PREFIX = "/home/dangertech/OneDrive/Code/lesson-controller/";
+//TODO: Find a way to let the user edit all this without recompiling (Config File!?)
+const std::string TIME_FILE_LOC = "timedata.dat";
+const std::string LESSON_FILE_LOC = "lessondata.dat";
 
 int read_table()
 {
 	// Space - and linebreak agnostic function that reads in the lessondata
-	return 0;
+	///// Timeframe data
+	std::ifstream timefile(TIME_FILE_LOC);
+	if (timefile.is_open())
+	{
+		char cur_char;
+		int brackets = 0; // Stores, on which 'indentation level' the parser is.
+		std::vector < int > num_buf; // Buffer to store parsed digits temporarily
+		while ( timefile.get(cur_char) )
+		{
+			if ( cur_char == ' ' || cur_char == '\n')
+				continue;
+			else if (cur_char == '{')
+			{
+				brackets++;
+				continue;
+			}
+			else if (cur_char == '}')
+				brackets--;
+			 
+			if (brackets == 2)
+			{
+				if (cur_char != ':')
+				{
+					// Write this number into the num_buffer
+					int this_buf = cur_char - '0'; // Make an int that represents the correct digit
+					num_buf.push_back(this_buf);
+					std::cout << cur_char;
+				}
+				else
+				{
+					if (num_buf.size() > 2)
+						std::cout << C_RED_B
+							  << "You have a timeframe that has more "
+							  << "digits than two. Please stop "
+							  << "violating standard 24 hour time "
+							  << "units and correct this issue in "
+							  << C_GREEN_U << DIR_PREFIX << TIME_FILE_LOC
+							  << C_OFF << std::endl;
+				}
+			}
+		}
+		std::cout << std::endl << num_buf.size();
+		timefile.close();
+		return 0;
+	}
+	else
+	{
+		std::cout << "Yeah shit, there's no file here!" << std::endl;
+		// Add something to address this issue
+		// Probably ask the user if a file should be created
+		// But do it in main(), please
+	}
+	return ERROR;
 }
 
 int write_table()
 {
 	// This function should create a human readable file with the table data in it
-	 
-	std::ofstream outfile(file_loc); // Open file stream
 	
-	///// Writing a little help text
-	outfile << "# This is the location where the data about your lessons is stored." << std::endl
-		<< "# It is designed to be human readable so that you can easily edit it," << std::endl
-		<< "# but note that in the future, there are plans to have arguments that let you edit your lessons with lesson-controller itself." << std::endl
+	// The file with the timestamps
+	std::ofstream timefile(TIME_FILE_LOC);
 	 
 	///// Writing the timeframes
 	 
-	outfile << "{ # The minutes your lessons start every day" << std::endl;
-	outfile << tabs(1);
+	timefile << "{ # The minutes your lessons start every day" << std::endl;
+	timefile << tabs(1);
 	for (int stamp = 0; stamp < timeframes.size(); stamp++)
 	{
-		outfile << "{"
+		timefile << "{"
 			<< timeframes[stamp].first << ":"
 			<< timeframes[stamp].second << "} ";
 	}
-	outfile << std::endl << "}" << std::endl << std::endl;
+	timefile << std::endl << "}" << std::endl << std::endl;
+	timefile.close();
+	 
 	 
 	 
 	///// Writing the timetable
 	 
-	outfile << "{ # Your timetable" << std::endl;
-	outfile << tabs(1) << " " << std::endl;
+	std::ofstream lessonfile(LESSON_FILE_LOC); // Open file stream
+	
+	///// Writing a little help text
+	lessonfile << "# This is the location where the data about your lessons is stored." << std::endl
+		<< "# It is designed to be human readable so that you can easily edit it," << std::endl
+		<< "# but note that in the future, there are plans to have arguments that let you edit your lessons with lesson-controller itself." << std::endl
+		<< "# " << std::endl
+		<< "# Lesson-controller is space- and linebreak-agnostic while reading this and the timedata.dat file, so you can format it pretty much however you want, BUT:" << std::endl
+		<< "# The file is reset every time the program performs a write operation (Right now, at every successful termination)" << std::endl
+		<< "# You have to enclose every day in curly brackets and every lesson in every day as well." << std::endl
+		<< "# The 3 Metadata that are stored (Subject, Teacher and Room) must be separated by commata." << std::endl
+		<< "# Right now, you see the stock configuration. To reset to it when you messed up, run: 'lesson --reset-data'. All your data will be lost." << std::endl;
+	 
+	lessonfile << "{ # Your timetable" << std::endl;
+	lessonfile << tabs(1) << " " << std::endl;
 	for (int iday = 0; iday<table.size(); iday++)
 	{
-		outfile << tabs(1) << "{" << " # " << cap(weekdays[iday]) <<  std::endl;
+		lessonfile << tabs(1) << "{" << " # " << cap(weekdays[iday]) <<  std::endl; // '# Weekday'
 		if (table[iday].size() > 0)
 		{
 			for (int ilesson = 0; ilesson<table[iday].size(); ilesson++)
 			{
-				outfile << tabs(2) << "{ ";
-				outfile << table[iday][ilesson].subject << ", "
+				lessonfile << tabs(2) << "{ ";
+				lessonfile << table[iday][ilesson].subject << ", "
 					<< table[iday][ilesson].teacher << ", "
 					<< table[iday][ilesson].room;
-				outfile << " }" << std::endl;
+				lessonfile << " }" << std::endl;
 			}
 		}
 		else
-			outfile << tabs(2) << " " << std::endl;
-		outfile << tabs(1) << "}" << std::endl
+			lessonfile << tabs(2) << " " << std::endl;
+		lessonfile << tabs(1) << "}" << std::endl
 			<< tabs(1) << std::endl;
 	}
-	outfile << "}" << std::endl;
+	lessonfile << "}" << std::endl;
+	lessonfile.close();
 	return 0;
 }
