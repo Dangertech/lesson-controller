@@ -307,8 +307,8 @@ int get_lesson(int c_hour, int c_minute) // Get the current lesson
 
 /////////////// Data reading and writing
 
-const std::string DIR_PREFIX = "/home/dangertech/OneDrive/Code/lesson-controller/";
 //TODO: Find a way to let the user edit all this without recompiling (Config File!?)
+const std::string DIR_PREFIX = "/home/dangertech/OneDrive/Code/lesson-controller/";
 const std::string TIME_FILE_LOC = "timedata.dat";
 const std::string LESSON_FILE_LOC = "lessondata.dat";
 
@@ -320,6 +320,7 @@ int read_table()
 	if (timefile.is_open())
 	{
 		char cur_char;
+		int digit_warn = false;
 		int brackets = 0; // Stores, on which 'indentation level' the parser is.
 		std::vector < int > num_buf; // Buffer to store parsed digits temporarily
 		while ( timefile.get(cur_char) )
@@ -340,23 +341,38 @@ int read_table()
 				{
 					// Write this number into the num_buffer
 					int this_buf = cur_char - '0'; // Make an int that represents the correct digit
+					std::cout << "This_buf: " << this_buf << std::endl;
 					num_buf.push_back(this_buf);
-					std::cout << cur_char;
 				}
 				else
 				{
-					if (num_buf.size() > 2)
+					std::cout << "num_buf: " << num_buf[0] << std::endl;
+					if (num_buf.size() == 1)
+					{
+						int hour = num_buf[0];
+					}
+					else if (num_buf.size() == 2)
+					{
+						int hour = num_buf[0] * 10 + num_buf[1];
+					}
+					else if (digit_warn == false)
+					{
 						std::cout << C_RED_B
 							  << "You have a timeframe that has more "
-							  << "digits than two. Please stop "
+							  << "digits than two.\nPlease stop "
 							  << "violating standard 24 hour time "
-							  << "units and correct this issue in "
+							  << "units and correct this issue in\n"
 							  << C_GREEN_U << DIR_PREFIX << TIME_FILE_LOC
 							  << C_OFF << std::endl;
+						digit_warn = true;
+					}
+					
+					timeframes.push_back( std::make_pair(hour, 0) );
+					num_buf.clear();
 				}
 			}
 		}
-		std::cout << std::endl << num_buf.size();
+		std::cout << timeframes[0].first;
 		timefile.close();
 		return 0;
 	}

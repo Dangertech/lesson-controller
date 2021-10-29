@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 			std::cout << "Invalid argument '" << argv[my_arg] << "'" << std::endl;
 	}
 	 
-	write_table();
+	//write_table();
 	 
 	return 0;
 }
