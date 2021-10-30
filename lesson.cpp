@@ -1,5 +1,6 @@
 #include <vector>
 #include <iostream>
+#include <cmath>
 #include <fstream>
 #include "lesson.h"
 #include "timecalc.h"
@@ -312,6 +313,16 @@ const std::string DIR_PREFIX = "/home/dangertech/OneDrive/Code/lesson-controller
 const std::string TIME_FILE_LOC = "timedata.dat";
 const std::string LESSON_FILE_LOC = "lessondata.dat";
 
+int vectoint(std::vector <int> vector)
+{
+	int vecint = 0;
+	for (int i=0; i<vector.size(); i++)
+	{
+		vecint += vector[vector.size()-1-i]*pow(10, i);
+	}
+	return vecint;
+}
+
 int read_table()
 {
 	// Space - and linebreak agnostic function that reads in the lessondata
@@ -320,59 +331,79 @@ int read_table()
 	if (timefile.is_open())
 	{
 		char cur_char;
-		int digit_warn = false;
 		int brackets = 0; // Stores, on which 'indentation level' the parser is.
 		std::vector < int > num_buf; // Buffer to store parsed digits temporarily
+		enum read_op { SKIP, READ_HOUR, READ_MINUTE };
+		read_op op = SKIP;
+		bool invalid_int_warn = false;
 		while ( timefile.get(cur_char) )
 		{
 			if ( cur_char == ' ' || cur_char == '\n')
 				continue;
-			else if (cur_char == '{')
-			{
+			
+			if (cur_char == '{')
 				brackets++;
-				continue;
-			}
-			else if (cur_char == '}')
+			if (cur_char == '}')
 				brackets--;
 			 
-			if (brackets == 2)
+			if (brackets == 2 && cur_char == '{')
 			{
-				if (cur_char != ':')
-				{
-					// Write this number into the num_buffer
-					int this_buf = cur_char - '0'; // Make an int that represents the correct digit
-					std::cout << "This_buf: " << this_buf << std::endl;
-					num_buf.push_back(this_buf);
-				}
-				else
-				{
-					std::cout << "num_buf: " << num_buf[0] << std::endl;
-					if (num_buf.size() == 1)
-					{
-						int hour = num_buf[0];
-					}
-					else if (num_buf.size() == 2)
-					{
-						int hour = num_buf[0] * 10 + num_buf[1];
-					}
-					else if (digit_warn == false)
-					{
-						std::cout << C_RED_B
-							  << "You have a timeframe that has more "
-							  << "digits than two.\nPlease stop "
-							  << "violating standard 24 hour time "
-							  << "units and correct this issue in\n"
-							  << C_GREEN_U << DIR_PREFIX << TIME_FILE_LOC
-							  << C_OFF << std::endl;
-						digit_warn = true;
-					}
-					
-					timeframes.push_back( std::make_pair(hour, 0) );
-					num_buf.clear();
-				}
+				// Store the operation that will be carried 
+				// out over the following loops
+				op = READ_HOUR;
+				continue; // Don't read in the current character
 			}
+			if (brackets == 2 && cur_char == ':')
+			{
+				op = READ_MINUTE;
+				// Just switched from the hour, 
+				// so get that and clear the buffer
+				int framehour = vectoint(num_buf);
+				std::cout << framehour << std::endl;
+				num_buf.clear();
+				continue;
+			}
+			if (brackets == 1 && cur_char == '}')
+			{
+				op = SKIP;
+				// Just switched from minute 
+				int framemin = vectoint(num_buf);
+				std::cout << framemin << std::endl;
+				num_buf.clear();
+			}
+			 
+			 
+			 
+			int asint = cur_char - '0';
+			switch (op)
+			{
+				case SKIP:
+					break;
+				case READ_MINUTE:
+					if (asint >= 0 && asint <= 9)
+						num_buf.push_back(asint);
+					else
+						invalid_int_warn = true;
+					std::cout << "\tMinutestore: " << asint << std::endl;
+					break;
+				case READ_HOUR:
+					if (asint >= 0 && asint <= 9)
+						num_buf.push_back(asint);
+					else
+						invalid_int_warn = true;
+					std::cout << "\tHourstore: " << asint << std::endl;
+					break;
+			}
+			
 		}
-		std::cout << timeframes[0].first;
+		 
+		if (invalid_int_warn)
+			std::cout << C_RED_B << "Your timeframe file contains characters "
+					  << "in the time location that are not numbers. Please "
+					  << "fix this issue by editing " << C_GREEN_U 
+					  << DIR_PREFIX << "/" << TIME_FILE_LOC << C_OFF << C_RED_B
+					  << " or issuing " << C_OFF << "lesson --reset-timeframes"
+					  << std::endl;
 		timefile.close();
 		return 0;
 	}
