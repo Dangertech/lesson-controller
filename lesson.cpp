@@ -323,7 +323,7 @@ int vectoint(std::vector <int> vector)
 	return vecint;
 }
 
-int read_table()
+int read_timeframes()
 {
 	// Space - and linebreak agnostic function that reads in the lessondata
 	///// Timeframe data
@@ -351,6 +351,7 @@ int read_table()
 				// Store the operation that will be carried 
 				// out over the following loops
 				op = READ_HOUR;
+				timeframes.push_back( std::make_pair(0,0) );
 				continue; // Don't read in the current character
 			}
 			if (brackets == 2 && cur_char == ':')
@@ -359,7 +360,8 @@ int read_table()
 				// Just switched from the hour, 
 				// so get that and clear the buffer
 				int framehour = vectoint(num_buf);
-				std::cout << framehour << std::endl;
+				//std::cout << framehour << std::endl;
+				timeframes[timeframes.size()-1].first = framehour;
 				num_buf.clear();
 				continue;
 			}
@@ -368,7 +370,8 @@ int read_table()
 				op = SKIP;
 				// Just switched from minute 
 				int framemin = vectoint(num_buf);
-				std::cout << framemin << std::endl;
+				//std::cout << framemin << std::endl;
+				timeframes[timeframes.size()-1].second = framemin;
 				num_buf.clear();
 			}
 			 
@@ -384,14 +387,14 @@ int read_table()
 						num_buf.push_back(asint);
 					else
 						invalid_int_warn = true;
-					std::cout << "\tMinutestore: " << asint << std::endl;
+					//std::cout << "\tMinutestore: " << asint << std::endl;
 					break;
 				case READ_HOUR:
 					if (asint >= 0 && asint <= 9)
 						num_buf.push_back(asint);
 					else
 						invalid_int_warn = true;
-					std::cout << "\tHourstore: " << asint << std::endl;
+					//std::cout << "\tHourstore: " << asint << std::endl;
 					break;
 			}
 			
@@ -402,19 +405,18 @@ int read_table()
 					  << "in the time location that are not numbers. Please "
 					  << "fix this issue by editing " << C_GREEN_U 
 					  << DIR_PREFIX << "/" << TIME_FILE_LOC << C_OFF << C_RED_B
-					  << " or issuing " << C_OFF << "lesson --reset-timeframes"
-					  << std::endl;
+					  << " or issuing " << C_OFF << "lesson --reset-timeframes" << std::endl
+					  << C_RED_B << "(The characters were replaced with 0s automatically)" << C_OFF
+					  << std::endl << std::endl;
 		timefile.close();
 		return 0;
 	}
-	else
-	{
-		std::cout << "Yeah shit, there's no file here!" << std::endl;
-		// Add something to address this issue
-		// Probably ask the user if a file should be created
-		// But do it in main(), please
-	}
 	return ERROR;
+}
+
+int read_lessondata()
+{
+	return 0;
 }
 
 int write_table()

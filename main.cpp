@@ -12,7 +12,24 @@ int main(int argc, char *argv[])
 {
 	 
 	get_time(); // Get the current time and write it into the variables
-	read_table(); // Read the table from the file specified in lesson.h
+	int timeread = read_timeframes(); // Read the timeframes from the file specified in lesson.h
+	int lessonread = read_lessondata();
+
+	if (timeread == ERROR && lessonread == ERROR)
+	{
+		// User probably started the application for the first time
+		// Tell the user to do lesson --create
+	}
+	else if (timeread == ERROR)
+	{
+		std::cout << C_RED_B << "There is no timeframe datafile at your data location given in the config file:" << std::endl
+				  << C_OFF << C_GREEN_U <<  DIR_PREFIX << TIME_FILE_LOC << std::endl
+				  << C_OFF << C_RED_B << "Please create one using " << C_OFF << "lesson --create-timeframes " << C_RED_B
+				  << "or change the location in your config file to the appropriate one;" << C_OFF << std::endl;
+	}
+	else if (lessonread == ERROR)
+	{
+	}
 	
 	///// Get config arguments
 	 
@@ -72,7 +89,7 @@ int main(int argc, char *argv[])
 			std::cout << "Invalid argument '" << argv[my_arg] << "'" << std::endl;
 	}
 	 
-	//write_table();
+	write_table();
 	 
 	return 0;
 }
