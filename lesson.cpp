@@ -7,7 +7,7 @@
 #include "args.h"
 
 
-std::vector < std::vector < struct lesson > > table =
+std::vector < std::vector < struct lesson > > table;/* =
 { 
 	{ // Sunday
 	},
@@ -59,6 +59,7 @@ std::vector < std::vector < struct lesson > > table =
 	{ // Saturday
 	} 
 };
+*/
 
 std::vector < std::pair<int, int> > timeframes; //{ {7, 45}, {8, 35}, {9, 35}, {10, 25}, {11, 25}, {12, 10}, {12, 55} };
 
@@ -313,6 +314,7 @@ const std::string DIR_PREFIX = "/home/dangertech/OneDrive/Code/lesson-controller
 const std::string TIME_FILE_LOC = "timedata.dat";
 const std::string LESSON_FILE_LOC = "lessondata.dat";
 
+// Convert a vector of digits (e.g. {4, 5}) to an integer (e.g. 45)
 int vectoint(std::vector <int> vector)
 {
 	int vecint = 0;
@@ -325,8 +327,7 @@ int vectoint(std::vector <int> vector)
 
 int read_timeframes()
 {
-	// Space - and linebreak agnostic function that reads in the lessondata
-	///// Timeframe data
+	// Space - and linebreak agnostic function that reads in the timeframes
 	std::ifstream timefile(DIR_PREFIX + TIME_FILE_LOC);
 	if (timefile.is_open())
 	{
@@ -340,6 +341,12 @@ int read_timeframes()
 		{
 			if ( cur_char == ' ' || cur_char == '\n')
 				continue;
+			 
+			if ( cur_char == '#' )
+			{
+				while ( cur_char != '\n')
+					timefile.get(cur_char);
+			}
 			
 			if (cur_char == '{')
 				brackets++;
@@ -414,9 +421,97 @@ int read_timeframes()
 	return ERROR;
 }
 
+// Converts a vector of chars to a string
+std::string vectostr(std::vector < char > vector)
+{
+	std::string final_str;
+	for (int i = 0; i<vector.size(); i++)
+	{
+		final_str.push_back(vector[i]);
+	}
+	return final_str;
+}
+
 int read_lessondata()
 {
-	return 0;
+	// Function to read in the lessondata
+	std::ifstream lessonfile(DIR_PREFIX + LESSON_FILE_LOC);
+	if (lessonfile.is_open())
+	{
+		char cur_char;
+		int brackets = 0;
+		std::vector < char > str_buf;
+		enum read_op { SKIP, READ_SUBJECT, READ_TEACHER, READ_ROOM};
+		read_op op = SKIP;
+		while ( lessonfile.get(cur_char) )
+		{
+			if ( cur_char == '#' )
+			{
+				while ( cur_char != '\n')
+					lessonfile.get(cur_char);
+			}
+			if (cur_char == ' ' || cur_char == '\n')
+				continue;
+			 
+			if (cur_char == '{')
+				brackets++;
+			if (cur_char == '}')
+				brackets--;
+			
+			// Mode setter and Data writer to the vector
+			if (brackets == 2 && cur_char == '{')
+				table.push_back(std::vector<struct lesson>());
+			if (brackets == 3 && cur_char == '{')
+			{
+				op = READ_SUBJECT;
+				table[table.size() -1].push_back(lesson());
+				continue;
+			}
+			if (brackets == 3 && cur_char == ',')
+			{
+				switch(op)
+				{
+					case READ_SUBJECT:
+						op = READ_TEACHER; 
+						// Why am I like this.
+						// Could I make a variable for that with pointers,
+						// but I am just too stupid?
+						table[table.size()-1][table[table.size() -1].size() -1].subject = vectostr(str_buf);
+						str_buf.clear();
+						continue;
+					case READ_TEACHER:
+						op = READ_ROOM; 
+						table[table.size()-1][table[table.size() -1].size() -1].teacher = vectostr(str_buf);
+						str_buf.clear();
+						continue;
+					default:
+						// Config file fucked up somehow, should send a message
+						break;
+				}
+			}
+			if (brackets == 2 && cur_char == '}')
+			{
+				op = SKIP;
+				table[table.size()-1][table[table.size()-1].size()-1].room = vectostr(str_buf);
+				str_buf.clear();
+				continue;
+			}
+			 
+			// Data reader
+			switch (op)
+			{
+				case SKIP:
+					break;
+				case READ_SUBJECT: case READ_TEACHER: case READ_ROOM:
+					str_buf.push_back(cur_char);
+					break;
+			}
+			 
+		}
+		lessonfile.close();
+		return 0;
+	}
+	return ERROR;
 }
 
 int write_table()
