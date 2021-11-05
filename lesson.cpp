@@ -327,7 +327,7 @@ int read_timeframes()
 {
 	// Space - and linebreak agnostic function that reads in the lessondata
 	///// Timeframe data
-	std::ifstream timefile(TIME_FILE_LOC);
+	std::ifstream timefile(DIR_PREFIX + TIME_FILE_LOC);
 	if (timefile.is_open())
 	{
 		char cur_char;
@@ -424,7 +424,7 @@ int write_table()
 	// This function should create a human readable file with the table data in it
 	
 	// The file with the timestamps
-	std::ofstream timefile(TIME_FILE_LOC);
+	std::ofstream timefile(DIR_PREFIX + TIME_FILE_LOC);
 	 
 	///// Writing the timeframes
 	 
@@ -443,7 +443,7 @@ int write_table()
 	 
 	///// Writing the timetable
 	 
-	std::ofstream lessonfile(LESSON_FILE_LOC); // Open file stream
+	std::ofstream lessonfile(DIR_PREFIX + LESSON_FILE_LOC); // Open file stream
 	
 	///// Writing a little help text
 	lessonfile << "# This is the location where the data about your lessons is stored." << std::endl
