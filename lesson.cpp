@@ -309,10 +309,39 @@ int get_lesson(int c_hour, int c_minute) // Get the current lesson
 
 /////////////// Data reading and writing
 
+bool write_data = true;
+bool print_timeframe_loc = false;
+bool print_lessondata_loc = false;
+
 //TODO: Find a way to let the user edit all this without recompiling (Config File!?)
 const std::string DIR_PREFIX = "/home/dangertech/OneDrive/Code/lesson-controller/";
 const std::string TIME_FILE_LOC = "timedata.dat";
 const std::string LESSON_FILE_LOC = "lessondata.dat";
+
+int validate_datafile(std::string file_loc, int minimum_brackets)
+{
+	std::ifstream file(file_loc);
+	char cur_char;
+	int open_brackets = 0;
+	int closed_brackets = 0;
+	if (file.is_open())
+	{
+		while ( file.get(cur_char) )
+		{
+			if (cur_char == '{')
+				open_brackets++;
+			else if (cur_char == '}')
+				closed_brackets++;
+		}
+		if (open_brackets != closed_brackets)
+			return ERR_UNEQUAL_BRACKETS;
+		if (open_brackets < minimum_brackets)
+			return ERR_TOO_FEW_BRACKETS;
+		file.close();
+		return 0;
+	}
+	return ERR_NONEXISTENT_FILE;
+}
 
 // Convert a vector of digits (e.g. {4, 5}) to an integer (e.g. 45)
 int vectoint(std::vector <int> vector)
@@ -328,6 +357,30 @@ int vectoint(std::vector <int> vector)
 int read_timeframes()
 {
 	// Space - and linebreak agnostic function that reads in the timeframes
+	 
+	// Pre-validation
+	int file_validity = validate_datafile(DIR_PREFIX + TIME_FILE_LOC, 2);
+	if (file_validity == ERR_UNEQUAL_BRACKETS)
+	{
+		std::cout << C_RED_B << "There are not as many open brackets "
+				  << "as closed brackets in your timeframe file." << std::endl
+				  << "Your time data might be fucked up and the file "
+				  << "will not be written until you resolve this issue. " << C_OFF
+				  << std::endl << std::endl;
+		print_timeframe_loc = true;
+		write_data = false;
+	
+	}
+	else if(file_validity == ERR_TOO_FEW_BRACKETS)
+	{
+		std::cout << C_RED_B << "You have too few brackets in your timeframe file "
+				  << "for it to be valid." << std::endl;
+		print_timeframe_loc = true;
+	}
+	else if(file_validity == ERR_NONEXISTENT_FILE)
+		return ERR_NONEXISTENT_FILE;
+	 
+	// Read the data
 	std::ifstream timefile(DIR_PREFIX + TIME_FILE_LOC);
 	if (timefile.is_open())
 	{
@@ -408,17 +461,19 @@ int read_timeframes()
 		}
 		 
 		if (invalid_int_warn)
+		{
 			std::cout << C_RED_B << "Your timeframe file contains characters "
 					  << "in the time location that are not numbers. Please "
-					  << "fix this issue by editing " << C_GREEN_U 
-					  << DIR_PREFIX << "/" << TIME_FILE_LOC << C_OFF << C_RED_B
+					  << "fix this issue by editing your timeframe file"
 					  << " or issuing " << C_OFF << "lesson --reset-timeframes" << std::endl
 					  << C_RED_B << "(The characters were replaced with 0s automatically)" << C_OFF
 					  << std::endl << std::endl;
+			print_timeframe_loc = true;
+		}
 		timefile.close();
 		return 0;
 	}
-	return ERROR;
+	return ERR_NONEXISTENT_FILE;
 }
 
 // Converts a vector of chars to a string
@@ -435,6 +490,18 @@ std::string vectostr(std::vector < char > vector)
 int read_lessondata()
 {
 	// Function to read in the lessondata
+	int file_validity = validate_datafile(DIR_PREFIX + LESSON_FILE_LOC, 16);
+	if (file_validity == ERR_UNEQUAL_BRACKETS)
+	{
+		std::cout << C_RED_B << "There are not as many open brackets "
+				  << "as closed brackets in your lessondata file. "
+				  << "Your lesson data might be fucked up and the file " 
+				  << "will not be written until you resolve this issue." << C_OFF
+				  << std::endl << std::endl;
+		write_data = true;
+		print_lessondata_loc = true;
+	}
+	// Read the data
 	std::ifstream lessonfile(DIR_PREFIX + LESSON_FILE_LOC);
 	if (lessonfile.is_open())
 	{
@@ -511,7 +578,7 @@ int read_lessondata()
 		lessonfile.close();
 		return 0;
 	}
-	return ERROR;
+	return ERR_NONEXISTENT_FILE;
 }
 
 int write_table()
