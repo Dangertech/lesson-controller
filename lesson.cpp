@@ -7,61 +7,10 @@
 #include "args.h"
 
 
-std::vector < std::vector < struct lesson > > table;/* =
-{ 
-	{ // Sunday
-	},
-	 
-	{ // Monday
-		{"English", "Ehlers", "333"}, 
-		{"French", "Lopez", "333"},
-		{"History", "Scherbel", "333"},
-		{"Biology", "Schwarz", "Bio2-223"},
-		{"Ethics", "Scherbel", "334"},
-		{"Latin", "Scheib", "333"},
-	},
-	 
-	{ // Tuesday
-		{"Maths", "Baerbel", "333"},
-		{"Maths", "Baerbel", "333"},
-		{"English", "Ehlers", "333"},
-		{"Biology", "Schwarz", "Bio1-221"},
-		{"Music", "Theisen", "Mu1"},
-		{"German", "Hegemann", "333"},
-	},
-	 
-	{ // Wednesday
-		{"German", "Hegemann", "333"},
-		{"Latin", "Scheib", "333"},
-		{"French", "Lopez", "333"},
-		{"Physics", "Eschborn", "Ph2-213"},
-		{"Chemistry", "Bender", "Ch2-216"},
-		{"Geography", "Freistein-Vogt", "333"}
-	},
-	 
-	{ // Thursday
-		{"Physics", "Eschborn", "Ph2-213"},
-		{"Maths", "Baerbel", "333"},
-		{"Physical Education", "Diehl", "Ha1"},
-		{"Physical Education", "Diehl", "Ha1"},
-		{"Geography", "Freistein-Vogt", "333"},
-		{"English", "Ehlers", "333"}
-	},
-	 
-	{ // Friday
-		{"Ethics", "Scherbel", "334"},
-		{"German", "Hegemann", "333"},
-		{"Latin", "Scheib", "333"},
-		{"French", "Lopez", "333"},
-		{"Chemistry", "Ch2-216", "333"},
-	},
-	 
-	{ // Saturday
-	} 
-};
-*/
 
-std::vector < std::pair<int, int> > timeframes; //{ {7, 45}, {8, 35}, {9, 35}, {10, 25}, {11, 25}, {12, 10}, {12, 55} };
+std::vector < std::vector < struct lesson > > table;
+std::vector < std::pair<int, int> > timeframes;
+
 
 void show_single_day (int my_day)
 {
@@ -315,7 +264,7 @@ bool print_lessondata_loc = false;
 
 //TODO: Find a way to let the user edit all this without recompiling (Config File!?)
 const std::string DIR_PREFIX = "/home/dangertech/OneDrive/Code/lesson-controller/";
-const std::string TIME_FILE_LOC = "timedata.dat";
+const std::string TIME_FILE_LOC = "timeframes.dat";
 const std::string LESSON_FILE_LOC = "lessondata.dat";
 
 int validate_datafile(std::string file_loc, int minimum_brackets)
@@ -362,20 +311,16 @@ int read_timeframes()
 	int file_validity = validate_datafile(DIR_PREFIX + TIME_FILE_LOC, 2);
 	if (file_validity == ERR_UNEQUAL_BRACKETS)
 	{
-		std::cout << C_RED_B << "There are not as many open brackets "
-				  << "as closed brackets in your timeframe file." << std::endl
-				  << "Your time data might be fucked up and the file "
-				  << "will not be written until you resolve this issue. " << C_OFF
-				  << std::endl << std::endl;
-		print_timeframe_loc = true;
-		write_data = false;
+		queue_error(std::string(C_RED_B) + "There are not as many open brackets"
+					+ "as closed brackets in your timeframe file. \n"
+					+ C_OFF, false, "timeframes");
 	
 	}
 	else if(file_validity == ERR_TOO_FEW_BRACKETS)
 	{
-		std::cout << C_RED_B << "You have too few brackets in your timeframe file "
-				  << "for it to be valid." << std::endl;
-		print_timeframe_loc = true;
+		queue_error(std::string(C_RED_B) + "You have too few brackets in your "
+					+ "timeframe file for it to be valid" + std::string(C_OFF),
+					true, "timeframes");
 	}
 	else if(file_validity == ERR_NONEXISTENT_FILE)
 		return ERR_NONEXISTENT_FILE;
@@ -462,13 +407,11 @@ int read_timeframes()
 		 
 		if (invalid_int_warn)
 		{
-			std::cout << C_RED_B << "Your timeframe file contains characters "
-					  << "in the time location that are not numbers. Please "
-					  << "fix this issue by editing your timeframe file"
-					  << " or issuing " << C_OFF << "lesson --reset-timeframes" << std::endl
-					  << C_RED_B << "(The characters were replaced with 0s automatically)" << C_OFF
-					  << std::endl << std::endl;
-			print_timeframe_loc = true;
+			queue_error(std::string(C_RED_B) + "Your timeframe file contains "
+						+ "characters in the time location that are not numbers.\n"
+						+ std::string(C_OFF) + "Advice:\n\t- Edit your timeframe file\n"
+						+ "\t- Issue 'lesson --reset-timeframes' (Your data will be lost)",
+						false, "timeframes");
 		}
 		timefile.close();
 		return 0;
@@ -493,13 +436,10 @@ int read_lessondata()
 	int file_validity = validate_datafile(DIR_PREFIX + LESSON_FILE_LOC, 16);
 	if (file_validity == ERR_UNEQUAL_BRACKETS)
 	{
-		std::cout << C_RED_B << "There are not as many open brackets "
-				  << "as closed brackets in your lessondata file. "
-				  << "Your lesson data might be fucked up and the file " 
-				  << "will not be written until you resolve this issue." << C_OFF
-				  << std::endl << std::endl;
-		write_data = true;
-		print_lessondata_loc = true;
+		queue_error(std::string(C_RED_B) + "There are not as many "
+				+ "open brackets as closed brackets in your lessondata "
+				+ "file. Please edit your lessondata file to fix this issue.",
+				false, "lessondata");
 	}
 	// Read the data
 	std::ifstream lessonfile(DIR_PREFIX + LESSON_FILE_LOC);

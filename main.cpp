@@ -22,24 +22,25 @@ int main(int argc, char *argv[])
 	}
 	else if (timeread == ERR_NONEXISTENT_FILE)
 	{
-		std::cout << C_RED_B << "There is no timeframe datafile at your data location given in the config file:" << std::endl
-				  << C_OFF << C_GREEN_U <<  DIR_PREFIX << TIME_FILE_LOC << std::endl
-				  << C_OFF << C_RED_B << "Please create one using " << C_OFF << "lesson --create-timeframes " << C_RED_B
-				  << "or change the location in your config file to the appropriate one;" << C_OFF << std::endl << std::endl;
+		queue_error(std::string(C_RED_B) + "There is no timeframe datafile "
+								+ "at your data location given in the config file;\n"
+								+ "Please create one using "
+								+ std::string(C_OFF) + "lesson --create-timeframes "
+								+ std::string(C_RED_B) + "or change the location in your "
+								+ "config file to the appropriate one;" 
+								+ std::string(C_OFF), true, "timeframes");
 	}
 	else if (lessonread == ERR_NONEXISTENT_FILE)
 	{
+		queue_error(std::string(C_RED_B) + "There is no lessondata file "
+					+ "at your data location given in the config file;\n"
+					+ "Please create one using "
+					+ std::string(C_OFF) + "lesson --create-datafile "
+					+ std::string(C_RED_B) + "or change the location in your "
+					+ "config file to the appropriate one;"
+					+ std::string(C_OFF), true, "lessondata");
 	}
 
-	///// Print file locations in case of errors in the files
-	if (print_lessondata_loc)
-		std::cout << C_RED_B << "Your lessondata file location:" << C_OFF
-				  << "[ " << C_GREEN_U << DIR_PREFIX + LESSON_FILE_LOC << C_OFF << " ]"
-				  << std::endl << std::endl;
-	if (print_timeframe_loc)
-		std::cout << C_RED_B << "Your timeframe file location:" << C_OFF
-				  << "[ " << C_GREEN_U << DIR_PREFIX + TIME_FILE_LOC << C_OFF << " ]"
-				  << std::endl << std::endl;
 	
 	///// Get config arguments
 	 
@@ -55,9 +56,8 @@ int main(int argc, char *argv[])
 	 
 	if (check_timeframe_availability() == -1) // Check if there are enough timeframes to match all lessons
 	{					  // issue a warning if not
-		std::cout << C_RED_B; // Start making text red
-		std::cout << "Warning: There isn't a timeframe for every lesson in the timetable" << std::endl;
-		std::cout << C_OFF; // Stop making text red
+		queue_error(std::string(C_RED_B) + "There is no timeframe "
+				+ "for every lesson in the timetable" + std::string(C_OFF));
 	}
 	 
 	// If there are no arguments, show the week and exit
@@ -67,7 +67,12 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 	
-	///// Execute arguments
+	// Print errors here already, in
+	// case the programe doesn't reach
+	// the end because of an error
+	print_errors();
+	 
+	//////////////// Execute arguments
 	 
 	for (int my_arg = 1; my_arg < argc; my_arg++)
 	{
@@ -101,6 +106,8 @@ int main(int argc, char *argv[])
 	 
 	if (write_data == true)
 		write_table();
+
+	print_errors();
 	 
 	return 0;
 }

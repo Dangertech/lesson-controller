@@ -16,6 +16,17 @@ extern bool count_empties; // Should empty lessons in the timetable be counted w
 #define ERR_UNEQUAL_BRACKETS -1010
 #define ERR_TOO_FEW_BRACKETS -900
 
+// Variables that store how the program should
+// respond to an error
+extern bool write_data;
+extern bool print_timeframe_loc;
+extern bool print_lessondata_loc;
+
+
+void queue_error(std::string message, bool my_write_data = true , std::string my_print_loc = "none");
+void print_errors();
+
+
 #define C_RED_B		"\033[1;31m"
 #define C_GREEN_U	"\033[4;32m"
 #define C_BLUE		"\033[34m"

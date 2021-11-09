@@ -24,11 +24,6 @@ int get_lesson(int, int); // Get the lesson at the given time (int, int)
 
 ///// Data reading and writing
 
-// main() only writes data if this is set to true
-extern bool write_data;
-extern bool print_timeframe_loc;
-extern bool print_lessondata_loc;
-
 extern const std::string DIR_PREFIX;
 extern const std::string TIME_FILE_LOC;
 extern const std::string LESSON_FILE_LOC;
