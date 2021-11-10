@@ -11,7 +11,36 @@
 int main(int argc, char *argv[])
 {
 	 
-	get_time();
+	get_time(); // Get the current time and write it into the variables
+	int timeread = read_timeframes(); // Read the timeframes from the file specified in lesson.h
+	int lessonread = read_lessondata();
+
+	if (timeread == ERR_NONEXISTENT_FILE && lessonread == ERR_NONEXISTENT_FILE)
+	{
+		// User probably started the application for the first time
+		// Tell the user to do lesson --create
+	}
+	else if (timeread == ERR_NONEXISTENT_FILE)
+	{
+		queue_error(std::string(C_RED_B) + "There is no timeframe datafile "
+								+ "at your data location given in the config file;\n"
+								+ "Please create one using "
+								+ std::string(C_OFF) + "lesson --create-timeframes "
+								+ std::string(C_RED_B) + "or change the location in your "
+								+ "config file to the appropriate one;" 
+								+ std::string(C_OFF), true, "timeframes");
+	}
+	else if (lessonread == ERR_NONEXISTENT_FILE)
+	{
+		queue_error(std::string(C_RED_B) + "There is no lessondata file "
+					+ "at your data location given in the config file;\n"
+					+ "Please create one using "
+					+ std::string(C_OFF) + "lesson --create-datafile "
+					+ std::string(C_RED_B) + "or change the location in your "
+					+ "config file to the appropriate one;"
+					+ std::string(C_OFF), true, "lessondata");
+	}
+
 	
 	///// Get config arguments
 	 
@@ -27,9 +56,8 @@ int main(int argc, char *argv[])
 	 
 	if (check_timeframe_availability() == -1) // Check if there are enough timeframes to match all lessons
 	{					  // issue a warning if not
-		std::cout << C_RED_B; // Start making text red
-		std::cout << "Warning: There isn't a timeframe for every lesson in the timetable" << std::endl;
-		std::cout << C_OFF; // Stop making text red
+		queue_error(std::string(C_RED_B) + "There is no timeframe "
+				+ "for every lesson in the timetable" + std::string(C_OFF));
 	}
 	 
 	// If there are no arguments, show the week and exit
@@ -39,7 +67,12 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 	
-	///// Execute arguments
+	// Print errors here already, in
+	// case the programe doesn't reach
+	// the end because of an error
+	print_errors();
+	 
+	//////////////// Execute arguments
 	 
 	for (int my_arg = 1; my_arg < argc; my_arg++)
 	{
@@ -70,6 +103,11 @@ int main(int argc, char *argv[])
 		else
 			std::cout << "Invalid argument '" << argv[my_arg] << "'" << std::endl;
 	}
+	 
+	if (write_data == true)
+		write_table();
+
+	print_errors();
 	 
 	return 0;
 }

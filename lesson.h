@@ -20,3 +20,14 @@ void show_lessons(std::vector < std::pair<int, int> >); // Show a range of lesso
 // The first item in the pair is the day, the second the lesson
 
 int get_lesson(int, int); // Get the lesson at the given time (int, int)
+
+
+///// Data reading and writing
+
+extern const std::string DIR_PREFIX;
+extern const std::string TIME_FILE_LOC;
+extern const std::string LESSON_FILE_LOC;
+
+int read_timeframes();
+int read_lessondata();
+int write_table();
