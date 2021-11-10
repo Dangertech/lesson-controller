@@ -12,9 +12,11 @@ std::vector < std::vector < struct lesson > > table;
 std::vector < std::pair<int, int> > timeframes;
 
 
+////// Show a day with some prettifications around it
+bool title = true; // Track if the title (e.g. --- Thursday ---) should be shown
 void show_single_day (int my_day)
 {
-	if (terse == false) // Show the requested weekday in a fancy format
+	if (terse == false && title) // Show the requested weekday in a fancy format
 	{
 		std::string my_weekday = weekdays[my_day];
 		my_weekday[0] = toupper(my_weekday[0]);
@@ -36,6 +38,8 @@ void show_single_day (int my_day)
 
 
 
+///// All this leads up to show_lessons
+//
 int spacing = 1;
 int time_size = 8, subj_size, teach_size, room_size;
 int x_pos;
@@ -112,6 +116,9 @@ void print_header()
 	std::cout << C_OFF;
 }
 
+
+bool table_header = true;
+
 // Show data for any lessons
 // Takes a vector of pairs with days and lesson numbers
 // Prints a table to stdout with the given lessons
@@ -155,7 +162,7 @@ void show_lessons(std::vector < std::pair<int, int> > to_show)
 		if (to_show[i].first < table.size() && to_show[i].second < table[day].size()) // Check to avoid crashes
 		{
 			// Make the header of the table (only if terse is false of course)
-			if (construct && !terse)
+			if (construct && !terse && table_header)
 			{
 				print_header();
 			}

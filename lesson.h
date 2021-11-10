@@ -11,11 +11,13 @@ struct lesson // Struct storing data of a lesson
 };
 
 extern std::vector < std::pair<int, int> > timeframes; // The times at which lessons start
-
 extern std::vector < std::vector < struct lesson > > table; // The timetable, a vector of a vector of lessons
 
+
+extern bool title;
 void show_single_day(int);
 
+extern bool table_header; // Track if a table header should be shown
 void show_lessons(std::vector < std::pair<int, int> >); // Show a range of lessons given in the vector of pairs
 // The first item in the pair is the day, the second the lesson
 

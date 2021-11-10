@@ -44,13 +44,19 @@ int main(int argc, char *argv[])
 	
 	///// Get config arguments
 	 
-	// Two loops are needed to ensure config like terse output can be put anywhere in the arguments
 	for (int my_arg = 1; my_arg < argc; my_arg++)
 	{
 		if (strcmp(argv[my_arg], "-t") == 0 || strcmp(argv[my_arg], "--terse") == 0)
 			terse = true;
 		else if (strcmp(argv[my_arg], "-c") == 0 || strcmp(argv[my_arg], "--no-count-empties") == 0)
 			count_empties = false;
+		else if (strcmp(argv[my_arg], "-H") == 0 || strcmp(argv[my_arg], "--no-show-header") == 0)
+			table_header = false;
+		else if (strcmp(argv[my_arg], "-T") == 0 || strcmp(argv[my_arg], "--no-show-title") == 0)
+			title = false;
+		// Default end thingy, the switch must be invalid
+		else if (strncmp(argv[my_arg], "-", 1) == 0)
+			queue_error("Invalid switch '" + std::string(argv[my_arg]) + "'");
 	}
 	 
 	 
