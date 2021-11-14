@@ -10,6 +10,8 @@
 
 int main(int argc, char *argv[])
 {
+	// Read the config file where all other locations are stored
+	read_config();
 	 
 	get_time(); // Get the current time and write it into the variables
 	int timeread = read_timeframes(); // Read the timeframes from the file specified in lesson.h

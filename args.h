@@ -1,5 +1,7 @@
-// Functions and variables that control the given arguments
-// Also a utility dump, expect everything here that doesn't really fit elsewhere
+// This file currently has 3 goals:
+// - Various utilities (also color constants and Stuff)
+// - Process direct arguments
+// - Read the config file
 #pragma once
 #include <string>
 #include <vector>
@@ -41,6 +43,7 @@ std::string cap(std::string); // Capitalize the first letter in a string
 
 std::string tabs(int); // Give a number of tabs
 
+
 // ARGUMENT PROCESSING
 
 int check_timeframe_availability(); // Best name, I know
@@ -49,3 +52,9 @@ void rel_lesson(int);
 
 void show_week(); // Show the whole week
 
+
+// CONFIG FILE PARSING
+
+std::string get_config_location();
+
+int read_config();

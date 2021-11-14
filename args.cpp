@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <string.h>
 #include "lesson.h"
 #include "timecalc.h"
 #include "args.h"
@@ -194,4 +195,43 @@ void show_week()
 		  << "Meanwhile, you can do '" << C_GREEN_U 
 		  << "lesson monday tuesday wednesday thursday friday" << C_OFF << "'"
 		  << "to have a substitute." << std::endl;
+}
+
+
+//////// CONFIG FILE PARSING
+
+// Read the config file location (aka $XDG_CONFIG_HOME)
+std::string get_config_location()
+{
+	std::string str_config_location;
+	// Check if there's a XDG_CONFIG_HOME environment variable
+	// that declares a custom config folder
+	char *config_location = std::getenv("XDG_CONFIG_HOME");
+	if (config_location == NULL)
+	{
+		// If this doesn't exist check for a custom LESSON_CONFIG variable
+		// This can be used to set a custom config location
+		// (Hey, which of YOUR programs have that)
+		config_location = std::getenv("LESSON_CONFIG");
+	}
+	if (config_location == NULL)
+	{
+		// Default to the home directory
+		config_location = std::getenv("HOME");
+		config_location = strcat(config_location, "/.config/lesson-controller/config.conf");
+	}
+	if (config_location == NULL)
+	{
+		// Ok, I give up
+		return "ERROR";
+	}
+	str_config_location = std::string(config_location);
+	return str_config_location;
+}
+
+int read_config()
+{
+	const std::string conf_loc = get_config_location();
+	std::cout << conf_loc;
+	return 0;
 }
