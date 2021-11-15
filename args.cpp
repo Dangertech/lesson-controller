@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 #include <string.h>
+#include <fstream>
+#include <ctype.h>
 #include "lesson.h"
 #include "timecalc.h"
 #include "args.h"
@@ -50,11 +52,11 @@ void print_errors()
 	///// Print file locations in case of errors in the files
 	if (print_lessondata_loc)
 		std::cout << C_RED_B << "Your lessondata file location:" << C_OFF
-				  << "[ " << C_GREEN_U << DIR_PREFIX + LESSON_FILE_LOC << C_OFF << " ]"
+				  << "[ " << C_GREEN_U << LESSON_FILE_LOC << C_OFF << " ]"
 				  << std::endl << std::endl;
 	if (print_timeframe_loc)
 		std::cout << C_RED_B << "Your timeframe file location:" << C_OFF
-				  << "[ " << C_GREEN_U << DIR_PREFIX + TIME_FILE_LOC << C_OFF << " ]"
+				  << "[ " << C_GREEN_U << TIME_FILE_LOC << C_OFF << " ]"
 				  << std::endl << std::endl;
 
 	if (write_data == false)
@@ -231,7 +233,69 @@ std::string get_config_location()
 
 int read_config()
 {
-	const std::string conf_loc = get_config_location();
-	std::cout << conf_loc;
-	return 0;
+	const std::string CONF_FILE_LOC = get_config_location();
+	std::ifstream conffile(CONF_FILE_LOC);
+	if (conffile.is_open())
+	{
+		char cur_char;
+		std::string str_buf;
+		std::string var_name;
+		std::string content;
+		enum read_op{SKIP, READ_VAR, READ_CONTENT};
+		read_op op = SKIP;
+		while (conffile.get(cur_char))
+		{
+			///// Read the syntax
+			 
+			if (cur_char == '#')
+			{
+				while (cur_char != '\n')
+					conffile.get(cur_char);
+			}
+			 
+			if (op == SKIP)
+			{
+				if (isalpha(cur_char))
+				{
+					op = READ_VAR;
+				}
+			}
+			 
+			if (op == READ_VAR)
+			{
+				if (cur_char == ' ')
+				{
+					var_name = str_buf;
+					str_buf.clear();
+					op = READ_CONTENT;
+				}
+				else
+					str_buf = str_buf + cur_char;
+			}
+			 
+			if (op == READ_CONTENT)
+			{
+				if (cur_char == '\n')
+				{
+					content = str_buf;
+					str_buf.clear();
+					op = SKIP;
+				}
+				if (cur_char != ' ' && cur_char != '=')
+					str_buf = str_buf + cur_char;
+			}
+			
+			// Process the variables var_name and content that store the 
+			// most recent parse
+			if (var_name == "TIME_FILE_LOC")
+			{
+				TIME_FILE_LOC = content;
+			}
+			else if (var_name == "LESSON_FILE_LOC")
+			{
+				LESSON_FILE_LOC = content;
+			}
+		}
+	}
+	return ERR_NONEXISTENT_FILE;
 }

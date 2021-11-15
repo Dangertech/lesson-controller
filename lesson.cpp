@@ -269,10 +269,8 @@ bool write_data = true;
 bool print_timeframe_loc = false;
 bool print_lessondata_loc = false;
 
-//TODO: Find a way to let the user edit all this without recompiling (Config File!?)
-const std::string DIR_PREFIX = "/home/dangertech/OneDrive/Code/lesson-controller/";
-const std::string TIME_FILE_LOC = "timeframes.dat";
-const std::string LESSON_FILE_LOC = "lessondata.dat";
+std::string TIME_FILE_LOC = "/home/dangertech/OneDrive/Code/lesson-controller/timeframes.dat";
+std::string LESSON_FILE_LOC = "/home/dangertech/OneDrive/Code/lesson-controller/lessondata.dat";
 
 int validate_datafile(std::string file_loc, int minimum_brackets)
 {
@@ -315,7 +313,7 @@ int read_timeframes()
 	// Space - and linebreak agnostic function that reads in the timeframes
 	 
 	// Pre-validation
-	int file_validity = validate_datafile(DIR_PREFIX + TIME_FILE_LOC, 2);
+	int file_validity = validate_datafile(TIME_FILE_LOC, 2);
 	if (file_validity == ERR_UNEQUAL_BRACKETS)
 	{
 		queue_error(std::string(C_RED_B) + "There are not as many open brackets"
@@ -333,7 +331,7 @@ int read_timeframes()
 		return ERR_NONEXISTENT_FILE;
 	 
 	// Read the data
-	std::ifstream timefile(DIR_PREFIX + TIME_FILE_LOC);
+	std::ifstream timefile(TIME_FILE_LOC);
 	if (timefile.is_open())
 	{
 		char cur_char;
@@ -440,7 +438,7 @@ std::string vectostr(std::vector < char > vector)
 int read_lessondata()
 {
 	// Function to read in the lessondata
-	int file_validity = validate_datafile(DIR_PREFIX + LESSON_FILE_LOC, 16);
+	int file_validity = validate_datafile(LESSON_FILE_LOC, 16);
 	if (file_validity == ERR_UNEQUAL_BRACKETS)
 	{
 		queue_error(std::string(C_RED_B) + "There are not as many "
@@ -449,7 +447,7 @@ int read_lessondata()
 				false, "lessondata");
 	}
 	// Read the data
-	std::ifstream lessonfile(DIR_PREFIX + LESSON_FILE_LOC);
+	std::ifstream lessonfile(LESSON_FILE_LOC);
 	if (lessonfile.is_open())
 	{
 		char cur_char;
@@ -533,7 +531,7 @@ int write_table()
 	// This function should create a human readable file with the table data in it
 	
 	// The file with the timestamps
-	std::ofstream timefile(DIR_PREFIX + TIME_FILE_LOC);
+	std::ofstream timefile(TIME_FILE_LOC);
 	 
 	///// Writing the timeframes
 	 
@@ -552,7 +550,7 @@ int write_table()
 	 
 	///// Writing the timetable
 	 
-	std::ofstream lessonfile(DIR_PREFIX + LESSON_FILE_LOC); // Open file stream
+	std::ofstream lessonfile(LESSON_FILE_LOC); // Open file stream
 	
 	///// Writing a little help text
 	lessonfile << "# This is the location where the data about your lessons is stored." << std::endl
