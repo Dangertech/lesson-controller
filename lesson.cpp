@@ -269,8 +269,8 @@ bool write_data = true;
 bool print_timeframe_loc = false;
 bool print_lessondata_loc = false;
 
-std::string TIME_FILE_LOC = "/home/dangertech/OneDrive/Code/lesson-controller/timeframes.dat";
-std::string LESSON_FILE_LOC = "/home/dangertech/OneDrive/Code/lesson-controller/lessondata.dat";
+std::string TIME_FILE_LOC;
+std::string LESSON_FILE_LOC;
 
 int validate_datafile(std::string file_loc, int minimum_brackets)
 {

@@ -202,12 +202,16 @@ void show_week()
 
 //////// CONFIG FILE PARSING
 
+
 // Read the config file location (aka $XDG_CONFIG_HOME)
 std::string get_config_location()
 {
 	std::string str_config_location;
 	// Check if there's a XDG_CONFIG_HOME environment variable
 	// that declares a custom config folder
+	
+	// Make a config_location var as c string, 
+	// to be able to catch NULL pointers
 	char *config_location = std::getenv("XDG_CONFIG_HOME");
 	if (config_location == NULL)
 	{
@@ -231,8 +235,27 @@ std::string get_config_location()
 	return str_config_location;
 }
 
+std::string HOME_DIR; //Internal declaration for
+					  // the home directory, initialized 
+					  // at the beginning of read_config()
+// Convert a tilde in front of a string to the current users home directory
+std::string convert_tilde(std::string input_string)
+{
+	if (strncmp(input_string.c_str(), "~/", 2) == 0)
+	{
+		input_string.erase(0, 1);
+		std::string home_dir = HOME_DIR;
+		input_string = home_dir + input_string;
+	}
+	return input_string;
+}
+
 int read_config()
 {
+	// Create a var holding the HOME because for
+	// some reason, the HOME is recognized as the file
+	// stream location in the while loop
+	HOME_DIR = std::string(std::getenv("HOME"));
 	const std::string CONF_FILE_LOC = get_config_location();
 	std::ifstream conffile(CONF_FILE_LOC);
 	if (conffile.is_open())
@@ -281,19 +304,20 @@ int read_config()
 					str_buf.clear();
 					op = SKIP;
 				}
-				if (cur_char != ' ' && cur_char != '=')
+				if (cur_char != ' ' && cur_char != '=' && cur_char != '\n')
 					str_buf = str_buf + cur_char;
 			}
 			
 			// Process the variables var_name and content that store the 
 			// most recent parse
-			if (var_name == "TIME_FILE_LOC")
+			if (content != "") // Only write if the content parsing is finished
 			{
-				TIME_FILE_LOC = content;
-			}
-			else if (var_name == "LESSON_FILE_LOC")
-			{
-				LESSON_FILE_LOC = content;
+				if (var_name == "TIME_FILE_LOC")
+					TIME_FILE_LOC = convert_tilde(content);
+				else if (var_name == "LESSON_FILE_LOC")
+					LESSON_FILE_LOC = convert_tilde(content);
+				 
+				content.clear();
 			}
 		}
 	}
