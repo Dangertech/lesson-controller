@@ -49,14 +49,16 @@ void print_errors()
 		if (i != error_messages.size()-1)
 			std::cout << std::endl << std::endl;
 	}
+	if (print_lessondata_loc || print_timeframe_loc)
+		std::cout << std::endl << std::endl;
 	 
 	///// Print file locations in case of errors in the files
 	if (print_lessondata_loc)
-		std::cout << C_RED_B << "Your lessondata file location:" << C_OFF
+		std::cout << C_RED_B << "Your lessondata file location: " << C_OFF
 				  << "[ " << C_GREEN_U << LESSON_FILE_LOC << C_OFF << " ]"
 				  << std::endl << std::endl;
 	if (print_timeframe_loc)
-		std::cout << C_RED_B << "Your timeframe file location:" << C_OFF
+		std::cout << C_RED_B << "Your timeframe file location: " << C_OFF
 				  << "[ " << C_GREEN_U << TIME_FILE_LOC << C_OFF << " ]"
 				  << std::endl << std::endl;
 
@@ -124,8 +126,22 @@ std::string tabs(int tab_num)
 
 int check_timeframe_availability()
 {
+	if (timeframes.size() == 0)
+	{
+		queue_error(std::string(C_RED_B)
+				+ "There are no timeframes set! Check that your "
+				+ "config file points to your timeframe file.\n"
+				+ "You can reset the timeframe file with " 
+				+ std::string(C_OFF) + "lesson --reset-timeframes "
+				+ std::string(C_RED_B) + "\nto learn about how your "
+				+ "file should look like.", true, "timeframes");
+		print_errors();
+		exit(77);
+	}
 	for (int i = 0; i<weekdays.size(); i++)
 	{
+		if (table[i].size() == 0)
+			continue;
 		if (timeframes.size() < table[i].size())
 			return -1;
 	}
@@ -246,27 +262,21 @@ void set_conf_file_loc()
 	CONF_FILE_LOC = std::string(config_location);
 }
 
-std::string HOME_DIR; //Internal declaration for
-					  // the home directory, initialized 
-					  // at the beginning of read_config()
+std::string HOME_DIR = std::string(std::getenv("HOME")); // Declaration only internal (for now)
+
 // Convert a tilde in front of a string to the current users home directory
 std::string convert_tilde(std::string input_string)
 {
 	if (strncmp(input_string.c_str(), "~/", 2) == 0)
 	{
 		input_string.erase(0, 1);
-		std::string home_dir = HOME_DIR;
-		input_string = home_dir + input_string;
+		input_string = HOME_DIR + input_string;
 	}
 	return input_string;
 }
 
 int read_config()
 {
-	// Create a var holding the HOME because for
-	// some reason, the HOME is recognized as the file
-	// stream location in the while loop
-	 
 	std::ifstream conffile(CONF_FILE_LOC);
 	if (conffile.is_open())
 	{

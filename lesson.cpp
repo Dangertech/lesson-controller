@@ -22,8 +22,13 @@ void show_single_day (int my_day)
 		my_weekday[0] = toupper(my_weekday[0]);
 		std::cout << "--- " << my_weekday << " ---" << std::endl;
 	}
-	if (table[my_day].size() == 0 && terse == false)
-		std::cout << "No lessons registered" << std::endl;
+	 
+	if (table[my_day].size() == 0)
+	{
+		if (terse == false)
+			std::cout << "No lessons registered" << std::endl;
+		return;
+	}
 	 
 	std::vector < std::pair <int,int> > day_vector;
 	for (int i = 0; i<table[my_day].size(); i++)
