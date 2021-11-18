@@ -10,8 +10,17 @@
 
 int main(int argc, char *argv[])
 {
+	// set the string CONF_FILE_LOC
+	set_conf_file_loc();
+	std::cout << CONF_FILE_LOC;
 	// Read the config file where all other locations are stored
-	read_config();
+	if (read_config() == ERR_NONEXISTENT_FILE)
+		queue_error(std::string(C_RED_B)
+				+ "The config location the program tried to determine, failed.\n"
+				+ "The determined file does not exist. \nPlease fix this by either creating\n"
+				+ std::string(C_OFF) + CONF_FILE_LOC + std::string (C_RED_B)
+				+ "\nor setting the " + std::string(C_OFF) + "LESSON_CONFIG " + std::string(C_RED_B)
+				+ "environment variable to your config file.");
 	get_time(); // Get the current time and write it into the variables
 	int timeread = read_timeframes(); // Read the timeframes from the file specified in lesson.h
 	int lessonread = read_lessondata();

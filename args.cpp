@@ -46,7 +46,8 @@ void print_errors()
 	{
 									// Turn color off again, just in case
 		std::cout << error_messages[i] << C_OFF; 
-		std::cout << std::endl << std::endl;
+		if (i != error_messages.size()-1)
+			std::cout << std::endl << std::endl;
 	}
 	 
 	///// Print file locations in case of errors in the files
@@ -202,9 +203,9 @@ void show_week()
 
 //////// CONFIG FILE PARSING
 
-
-// Read the config file location (aka $XDG_CONFIG_HOME)
-std::string get_config_location()
+std::string CONF_FILE_LOC;
+// Set the CONF_FILE_LOC which references the location of config.conf
+void set_conf_file_loc()
 {
 	std::string str_config_location;
 	// Check if there's a XDG_CONFIG_HOME environment variable
@@ -229,10 +230,20 @@ std::string get_config_location()
 	if (config_location == NULL)
 	{
 		// Ok, I give up
-		return "ERROR";
+		queue_error(std::string(C_RED_B) 
+			+ "A valid config location could not be determined.\n"
+			+ "Please declare either a " 
+			+ std::string(C_OFF) + "XDG_CONFIG_HOME"
+			+ std::string(C_RED_B) 
+			+ ", a\n" + std::string(C_OFF) +  "HOME " 
+			+ std::string(C_RED_B) 
+			+ "or the specific " + std::string(C_OFF) 
+			+ "LESSON_CONFIG " + std::string(C_RED_B) 
+			+ "environment variable,\nwith which the config file location can be determined.");
+		print_errors();
+		exit(8); // 8 is more or less random, should think about useful exit codes
 	}
-	str_config_location = std::string(config_location);
-	return str_config_location;
+	CONF_FILE_LOC = std::string(config_location);
 }
 
 std::string HOME_DIR; //Internal declaration for
@@ -255,8 +266,7 @@ int read_config()
 	// Create a var holding the HOME because for
 	// some reason, the HOME is recognized as the file
 	// stream location in the while loop
-	HOME_DIR = std::string(std::getenv("HOME"));
-	const std::string CONF_FILE_LOC = get_config_location();
+	 
 	std::ifstream conffile(CONF_FILE_LOC);
 	if (conffile.is_open())
 	{
@@ -320,6 +330,7 @@ int read_config()
 				content.clear();
 			}
 		}
+		return 0;
 	}
 	return ERR_NONEXISTENT_FILE;
 }

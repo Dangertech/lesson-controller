@@ -55,6 +55,8 @@ void show_week(); // Show the whole week
 
 // CONFIG FILE PARSING
 
-std::string get_config_location();
+extern std::string CONF_FILE_LOC;
+
+void set_conf_file_loc();
 
 int read_config();
