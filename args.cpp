@@ -306,13 +306,13 @@ int read_config()
 			 
 			if (op == READ_VAR)
 			{
-				if (cur_char == ' ')
+				if (cur_char == '=')
 				{
 					var_name = str_buf;
 					str_buf.clear();
 					op = READ_CONTENT;
 				}
-				else
+				if (cur_char != ' ' && cur_char != '=' && cur_char != '\n')
 					str_buf = str_buf + cur_char;
 			}
 			 
