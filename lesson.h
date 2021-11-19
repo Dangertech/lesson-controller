@@ -13,6 +13,16 @@ struct lesson // Struct storing data of a lesson
 extern std::vector < std::pair<int, int> > timeframes; // The times at which lessons start
 extern std::vector < std::vector < struct lesson > > table; // The timetable, a vector of a vector of lessons
 
+///// Colors for the timetable shown
+// The values here are the defaults
+// They are meant to be set by the config file
+extern std::string 
+	   time_color,
+	   subject_color,
+	   teacher_color,
+	   room_color,
+	   header_color,
+	   separator_color;
 
 extern bool title;
 void show_single_day(int);
@@ -25,10 +35,8 @@ int get_lesson(int, int); // Get the lesson at the given time (int, int)
 
 
 ///// Data reading and writing
-
-extern const std::string DIR_PREFIX;
-extern const std::string TIME_FILE_LOC;
-extern const std::string LESSON_FILE_LOC;
+extern std::string TIME_FILE_LOC;
+extern std::string LESSON_FILE_LOC;
 
 int read_timeframes();
 int read_lessondata();

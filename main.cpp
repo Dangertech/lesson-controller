@@ -10,7 +10,16 @@
 
 int main(int argc, char *argv[])
 {
-	 
+	// set the string CONF_FILE_LOC
+	set_conf_file_loc();
+	// Read the config file where all other locations are stored
+	if (read_config() == ERR_NONEXISTENT_FILE)
+		queue_error(std::string(C_RED_B)
+				+ "The config location the program tried to determine, failed.\n"
+				+ "The determined file does not exist. \nPlease fix this by either creating\n"
+				+ std::string(C_OFF) + CONF_FILE_LOC + std::string (C_RED_B)
+				+ "\nor setting the " + std::string(C_OFF) + "LESSON_CONFIG " + std::string(C_RED_B)
+				+ "environment variable to your config file.");
 	get_time(); // Get the current time and write it into the variables
 	int timeread = read_timeframes(); // Read the timeframes from the file specified in lesson.h
 	int lessonread = read_lessondata();
@@ -40,7 +49,7 @@ int main(int argc, char *argv[])
 					+ "config file to the appropriate one;"
 					+ std::string(C_OFF), true, "lessondata");
 	}
-
+	 
 	
 	///// Get config arguments
 	 
@@ -65,6 +74,7 @@ int main(int argc, char *argv[])
 		queue_error(std::string(C_RED_B) + "There is no timeframe "
 				+ "for every lesson in the timetable" + std::string(C_OFF));
 	}
+	
 	 
 	// If there are no arguments, show the week and exit
 	if (argc == 1)
@@ -114,6 +124,6 @@ int main(int argc, char *argv[])
 		write_table();
 
 	print_errors();
-	 
+	
 	return 0;
 }
