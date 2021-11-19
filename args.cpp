@@ -275,6 +275,38 @@ std::string convert_tilde(std::string input_string)
 	return input_string;
 }
 
+std::string process_color_input(std::string col_str)
+{
+	// Remove capitalization
+	for (int i = 0;i<col_str.size();i++)
+	{
+		col_str[i] = tolower(col_str[i]);
+	}
+	 
+	if (col_str == "black")
+		return C_BLACK;
+	else if (col_str == "red")
+		return C_RED;
+	else if (col_str == "green")
+		return C_GREEN;
+	else if (col_str == "yellow")
+		return C_YELLOW;
+	else if (col_str == "green")
+		return C_GREEN;
+	else if (col_str == "blue")
+		return C_BLUE;
+	else if (col_str == "purple")
+		return C_PURPLE;
+	else if (col_str == "cyan")
+		return C_CYAN;
+	else if (col_str == "white")
+		return C_WHITE;
+	// I know, this statement doesn't matter
+	else if (col_str == "off" || col_str == "none" || col_str == "no_color")
+		return C_OFF;
+	return C_OFF;
+}
+
 int read_config()
 {
 	std::ifstream conffile(CONF_FILE_LOC);
@@ -336,7 +368,18 @@ int read_config()
 					TIME_FILE_LOC = convert_tilde(content);
 				else if (var_name == "LESSON_FILE_LOC")
 					LESSON_FILE_LOC = convert_tilde(content);
-				 
+				else if (var_name == "time_color")
+					time_color = process_color_input(content);
+				else if (var_name == "subject_color")
+					subject_color = process_color_input(content);
+				else if (var_name == "teacher_color")
+					teacher_color = process_color_input(content);
+				else if (var_name == "room_color")
+					room_color = process_color_input(content);
+				else if (var_name == "header_color")
+					header_color = process_color_input(content);
+				else if (var_name == "separator_color")
+					separator_color = process_color_input(content);
 				content.clear();
 			}
 		}

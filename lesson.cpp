@@ -11,6 +11,13 @@
 std::vector < std::vector < struct lesson > > table;
 std::vector < std::pair<int, int> > timeframes;
 
+std::string
+	time_color = C_OFF,
+	subject_color = C_OFF,
+	teacher_color = C_OFF,
+	room_color = C_OFF,
+	header_color = C_BLUE,
+	separator_color = C_BLUE;
 
 ////// Show a day with some prettifications around it
 bool title = true; // Track if the title (e.g. --- Thursday ---) should be shown
@@ -65,7 +72,7 @@ void terse_space(int custom_spaces) // [Internal only], used for show_lessons
 		// Make spaces according to the input argument given
 		print_chars(" ", custom_spaces);
 		x_pos += custom_spaces;
-		std::cout << C_BLUE << "|" << C_OFF;
+		std::cout << separator_color << "|" << C_OFF;
 		x_pos++;
 		// Make spacing spaces
 		print_chars(" ",spacing);
@@ -82,8 +89,8 @@ void print_header()
 	// Just to make my head hurt less
 	int des_pos; 
 	
-	// Blue color underlined
-	std::cout << C_BLUE_U;
+	// Print in header_color from config file
+	std::cout << header_color;
 	 
 	std::cout << "=TIME";
 	x_pos += 5;
@@ -172,10 +179,10 @@ void show_lessons(std::vector < std::pair<int, int> > to_show)
 				print_header();
 			}
 			 
-			 
 			// Show time
 			if (terse == false)
 			{
+				std::cout << time_color; 
 				std::cout << "[";
 				x_pos++;
 			}
@@ -186,7 +193,7 @@ void show_lessons(std::vector < std::pair<int, int> > to_show)
 			}
 			else
 			{
-				std::cout << C_RED_B << "!" << C_OFF;
+				std::cout << C_RED_B << "!" << C_OFF << time_color;
 				x_pos++;
 			}
 			 
@@ -199,7 +206,7 @@ void show_lessons(std::vector < std::pair<int, int> > to_show)
 			}
 			else
 			{
-				std::cout << C_RED_B << "!" << C_OFF;
+				std::cout << C_RED_B << "!" << C_OFF << time_color;
 				x_pos++;
 			}
 			 
@@ -219,20 +226,26 @@ void show_lessons(std::vector < std::pair<int, int> > to_show)
 				x_pos++;
 			}
 			// Time end 
+			std::cout << C_OFF; 
 			 
-			 
-			std::cout << table[day][lesson].subject;
+			if (terse == false)
+				std::cout << subject_color;
+			std::cout << table[day][lesson].subject << C_OFF;
 			x_pos += table[day][lesson].subject.size();
 			terse_space((time_size+subj_size+spacing) - x_pos);
 			 
-			std::cout << table[day][lesson].teacher;
+			if (terse == false)
+				std::cout << teacher_color;
+			std::cout << table[day][lesson].teacher << C_OFF;
 			x_pos += table[day][lesson].teacher.size();
 			// 3* spacing bcs the spacing was applied three times up to here
 			// +1 bcs there was an additional | character
 			// I hate this calculation too, by the way
 			terse_space((time_size+subj_size+teach_size+spacing*3+1) - x_pos);
 			 
-			std::cout << table[day][lesson].room;
+			if (terse == false)
+				std::cout << room_color;
+			std::cout << table[day][lesson].room << C_OFF;
 			x_pos += table[day][lesson].room.size();
 			 
 			// Enforce break after the last lesson is printed

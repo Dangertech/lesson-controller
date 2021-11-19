@@ -28,11 +28,17 @@ extern bool print_lessondata_loc;
 void queue_error(std::string message, bool my_write_data = true , std::string my_print_loc = "none");
 void print_errors();
 
-
+#define C_BLACK		"\033[30m"
+#define C_RED		"\033[31m"
 #define C_RED_B		"\033[1;31m"
+#define C_GREEN		"\033[32m"
 #define C_GREEN_U	"\033[4;32m"
+#define C_YELLOW	"\033[33m"
 #define C_BLUE		"\033[34m"
 #define C_BLUE_U	"\033[4;34m"
+#define C_PURPLE	"\033[35m"
+#define C_CYAN		"\033[36m"
+#define C_WHITE		"\033[37m"
 #define C_OFF		"\033[0m"
 
 int int_length(int);
@@ -59,4 +65,7 @@ extern std::string CONF_FILE_LOC;
 
 void set_conf_file_loc();
 
+std::string process_color_input(std::string);
+
 int read_config();
+
