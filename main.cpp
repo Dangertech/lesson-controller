@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 		else if (strcmp(argv[my_arg], "-T") == 0 || strcmp(argv[my_arg], "--no-show-title") == 0)
 			title = false;
 		// Default end thingy, the switch must be invalid
-		else if (strncmp(argv[my_arg], "-", 1) == 0)
+		else if (strncmp(argv[my_arg], "-", 1) == 0 && isalpha(argv[my_arg][1]) != 0)
 			queue_error("Invalid switch '" + std::string(argv[my_arg]) + "'");
 	}
 	 
