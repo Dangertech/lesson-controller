@@ -145,12 +145,15 @@ void show_lessons(std::vector < std::pair<int, int> > to_show)
 		int lesson = to_show[i].second;
 		if (day == -1 || lesson == -1)
 			continue;
-		if (subj_size < table[day][lesson].subject.length())
-			subj_size = table[day][lesson].subject.length();
-		if (teach_size < table[day][lesson].teacher.length())
-			teach_size = table[day][lesson].teacher.length();
-		if (room_size < table[day][lesson].room.length())
-			room_size = table[day][lesson].room.length();
+		if (table.size() > day && table[day].size() > lesson)
+		{
+			if (subj_size < table[day][lesson].subject.length())
+				subj_size = table[day][lesson].subject.length();
+			if (teach_size < table[day][lesson].teacher.length())
+				teach_size = table[day][lesson].teacher.length();
+			if (room_size < table[day][lesson].room.length())
+				room_size = table[day][lesson].room.length();
+		}
 		// Ugly but works just fine for only three variables
 	}
 	 
@@ -170,8 +173,7 @@ void show_lessons(std::vector < std::pair<int, int> > to_show)
 		}
 		 
 		 
-		 
-		if (to_show[i].first < table.size() && to_show[i].second < table[day].size()) // Check to avoid crashes
+		if (day < table.size() && lesson < table[day].size()) // Check to avoid crashes
 		{
 			// Make the header of the table (only if terse is false of course)
 			if (construct && !terse && table_header)
