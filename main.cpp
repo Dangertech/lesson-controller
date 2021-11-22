@@ -64,8 +64,8 @@ int main(int argc, char *argv[])
 		else if (strcmp(argv[my_arg], "-T") == 0 || strcmp(argv[my_arg], "--no-show-title") == 0)
 			title = false;
 		// Default end thingy, the switch must be invalid
-		else if (strncmp(argv[my_arg], "-", 1) == 0 && isalpha(argv[my_arg][1]) != 0)
-			queue_error("Invalid switch '" + std::string(argv[my_arg]) + "'");
+		// else if (strncmp(argv[my_arg], "-", 1) == 0 && isalpha(argv[my_arg][1]) != 0)
+		// 	queue_error("Invalid switch '" + std::string(argv[my_arg]) + "'");
 	}
 	 
 	 
@@ -93,7 +93,11 @@ int main(int argc, char *argv[])
 	for (int my_arg = 1; my_arg < argc; my_arg++)
 	{
 		// Get if an argument is a weekday and store the weekday_id
-		int weekday_check = vecstrcmp(argv[my_arg], weekdays); // Get the responding array entry for the given argument, -1 if nothing corresponds
+		// Get the responding array entry for the given argument, ERROR if nothing corresponds
+		char* test_day = argv[my_arg];
+		for (int i = 0; i<strlen(argv[my_arg]); i++)
+			test_day[i] = tolower(test_day[i]);
+		int weekday_check = vecstrcmp(test_day, weekdays); 
 		 
 		// Execute actions based on arguments
 		// Currently only incorporates the first argument, 
@@ -102,7 +106,32 @@ int main(int argc, char *argv[])
 		if (weekday_check != ERROR) // Show timetable of given weekday
 			show_single_day(weekday_check);
 		 
-		 
+ 		else if (vecstrcmp(argv[my_arg], {"help", "Help", "--help", "-h", "-help"}) != ERROR)
+		{
+			std::cout << "Usage: lesson [SWITCHES] [FILTER]..." << std::endl
+				<< std::endl
+				<< "Tool to monitor and manage static timetables, like in school\n"
+				<< std::endl
+				<< "WARNING: THIS HELP TEXT CONTAINS FEATURES THAT ARE YET TO BE IMPLEMENTED\n"
+				<< std::endl
+				<< "FILTERS\n"
+				<< "A filter can be a weekday, a specific lesson, or a relative lesson\n"
+				<< std::endl
+				<< "   lesson monday/tuesday, etc...\t"
+				<< "show all lessons registered on this weekday\n"
+				<< "   lesson +n\t\t\t\t"
+				<< "show the lesson n lessons ahead of the current one\n"
+				<< "   lesson -n\t\t\t\t"
+				<< "show the lesson n lessons back of the current one\n"
+				<< "   lesson -d n\t\t\t\t"
+				<< "show the day n days from this one;\n"
+				<< "\t\t\t\t\t\tcan be negative;\n"
+				<< "\t\t\t\t\t\tcan be augmented with a specific lesson number\n"
+				<< "\t\t\t\t\t\t(e.g. lesson -d 3 1 -> First lesson three days ahead)\n"
+				<< "   lesson tomorrow/today/yesterday\t" 
+				<< "supported relative weekday displays\n"
+				<< std::endl;
+		}
 		// Show relative lesson (+1/+3/-5/+0)
 		else if (strncmp(argv[my_arg], "+", 1) == 0 || strncmp(argv[my_arg], "-", 1) == 0)
 		{
@@ -111,8 +140,8 @@ int main(int argc, char *argv[])
 				rel_lesson(atoi(argv[my_arg])); // Show +n lessons
 			}
 		}
-		 
-		 
+		else if (strcmp(argv[my_arg], "0") == 0)
+			rel_lesson(atoi(argv[my_arg]));
 		else if (strcmp(argv[my_arg], "time") == 0) // Only meant for debug
 			std::cout << "Current time: " << hour << ":" << minute << std::endl;
 		 
