@@ -63,50 +63,7 @@ int main(int argc, char *argv[])
 			table_header = false;
 		else if (strcmp(argv[my_arg], "-T") == 0 || strcmp(argv[my_arg], "--no-show-title") == 0)
 			title = false;
-		// Default end thingy, the switch must be invalid
-		// else if (strncmp(argv[my_arg], "-", 1) == 0 && isalpha(argv[my_arg][1]) != 0)
-		// 	queue_error("Invalid switch '" + std::string(argv[my_arg]) + "'");
-	}
-	 
-	 
-	if (check_timeframe_availability() == -1) // Check if there are enough timeframes to match all lessons
-	{					  // issue a warning if not
-		queue_error(std::string(C_RED_B) + "There is no timeframe "
-				+ "for every lesson in the timetable" + std::string(C_OFF));
-	}
-	
-	 
-	// If there are no arguments, show the week and exit
-	if (argc == 1)
-	{
-		show_week();
-		return 0;
-	}
-	
-	// Print errors here already, in
-	// case the programe doesn't reach
-	// the end because of an error
-	print_errors();
-	 
-	//////////////// Execute arguments
-	 
-	for (int my_arg = 1; my_arg < argc; my_arg++)
-	{
-		// Get if an argument is a weekday and store the weekday_id
-		// Get the responding array entry for the given argument, ERROR if nothing corresponds
-		char* test_day = argv[my_arg];
-		for (int i = 0; i<strlen(argv[my_arg]); i++)
-			test_day[i] = tolower(test_day[i]);
-		int weekday_check = vecstrcmp(test_day, weekdays); 
-		 
-		// Execute actions based on arguments
-		// Currently only incorporates the first argument, 
-		// needs to be loop for all in the future
-		
-		if (weekday_check != ERROR) // Show timetable of given weekday
-			show_single_day(weekday_check);
-		 
- 		else if (vecstrcmp(argv[my_arg], {"help", "Help", "--help", "-h", "-help"}) != ERROR)
+		else if (vecstrcmp(argv[my_arg], {"help", "Help", "--help", "-h", "-help"}) != ERROR)
 		{
 			std::cout << "Usage: lesson [SWITCHES...] [FILTER...]" << std::endl
 				<< std::endl
@@ -204,6 +161,52 @@ int main(int argc, char *argv[])
 				<< "Written by Kjell Nagel, student at STAMA, Bad Kreuznach, Germany\n"
 				;
 		}
+		// Default end thingy, the switch must be invalid
+		else if (strncmp(argv[my_arg], "-", 1) == 0 && isalpha(argv[my_arg][1]) != 0)
+		{
+			 std::cout << "Invalid switch '" << std::string(argv[my_arg]) << "'" << std::endl
+					   << "To get info on how to use this program, use " << C_GREEN_U << "lesson --help" << C_OFF << std::endl;
+		}
+	}
+	 
+	 
+	if (check_timeframe_availability() == -1) // Check if there are enough timeframes to match all lessons
+	{					  // issue a warning if not
+		queue_error(std::string(C_RED_B) + "There is no timeframe "
+				+ "for every lesson in the timetable" + std::string(C_OFF));
+	}
+	
+	 
+	// If there are no arguments, show the week and exit
+	if (argc == 1)
+	{
+		show_week();
+		return 0;
+	}
+	
+	// Print errors here already, in
+	// case the programe doesn't reach
+	// the end because of an error
+	print_errors();
+	 
+	//////////////// Execute arguments
+	 
+	for (int my_arg = 1; my_arg < argc; my_arg++)
+	{
+		// Get if an argument is a weekday and store the weekday_id
+		// Get the responding array entry for the given argument, ERROR if nothing corresponds
+		char* test_day = argv[my_arg];
+		for (int i = 0; i<strlen(argv[my_arg]); i++)
+			test_day[i] = tolower(test_day[i]);
+		int weekday_check = vecstrcmp(test_day, weekdays); 
+		 
+		// Execute actions based on arguments
+		// Currently only incorporates the first argument, 
+		// needs to be loop for all in the future
+		
+		if (weekday_check != ERROR) // Show timetable of given weekday
+			show_single_day(weekday_check);
+		 
 		// Show relative lesson (+1/+3/-5/+0)
 		else if (strncmp(argv[my_arg], "+", 1) == 0 || strncmp(argv[my_arg], "-", 1) == 0)
 		{
@@ -218,7 +221,10 @@ int main(int argc, char *argv[])
 			std::cout << "Current time: " << hour << ":" << minute << std::endl;
 		 
 		else
-			std::cout << "Invalid argument '" << argv[my_arg] << "'" << std::endl;
+		{
+			std::cout << "Invalid argument '" << argv[my_arg] << "'" << std::endl
+					  << "To get info on how to use this program, use " << C_GREEN_U << "lesson --help" << C_OFF << std::endl;
+		}
 	}
 	 
 	if (write_data == true)
