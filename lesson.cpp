@@ -535,15 +535,35 @@ int read_lessondata()
 				case SKIP:
 					break;
 				case READ_SUBJECT: case READ_TEACHER: case READ_ROOM:
-					str_buf.push_back(cur_char);
+					if (cur_char != '_')
+						str_buf.push_back(cur_char);
+					else // Convert underscores to spaces
+						str_buf.push_back(' ');
 					break;
 			}
 			 
 		}
+		// Push back the remaining days
+		// if there are not all brackets for all days in the file
+		// Fixes a LOT of weird things while reading the data
+		for (int i=0; i<(table.size()-7); i++)
+			table.push_back(std::vector<struct lesson>());
 		lessonfile.close();
 		return 0;
 	}
 	return ERR_NONEXISTENT_FILE;
+}
+
+// Converts converted special characters back to their
+// original state in the file
+std::string convert_specials (std::string to_convert)
+{
+	for (int i = 0; i<to_convert.size(); i++)
+	{
+		if (to_convert[i] == ' ')
+			to_convert[i] = '_';
+	}
+	return to_convert;
 }
 
 int write_table()
@@ -593,9 +613,9 @@ int write_table()
 			for (int ilesson = 0; ilesson<table[iday].size(); ilesson++)
 			{
 				lessonfile << tabs(2) << "{ ";
-				lessonfile << table[iday][ilesson].subject << ", "
-					<< table[iday][ilesson].teacher << ", "
-					<< table[iday][ilesson].room;
+				lessonfile << convert_specials(table[iday][ilesson].subject) << ", "
+					<< convert_specials(table[iday][ilesson].teacher) << ", "
+					<< convert_specials(table[iday][ilesson].room);
 				lessonfile << " }" << std::endl;
 			}
 		}

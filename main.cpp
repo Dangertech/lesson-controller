@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
 				<< std::endl
 				<< "   -t/--terse\t\t\t\t"
 				<< "makes all output terse, suited for script parsing\n"
-				<< "   -c/--no-count-empties[WIP]t\t"
+				<< "   -c/--no-count-empties[WIP]\t"
 				<< "relative arguments do not count lessons that don't happen \n"
 				<< "\t\t\t\t\t\tbut the timeframes indicate that there might be one\n"
 				<< "   -H/--no-show-header\t\t\t"
