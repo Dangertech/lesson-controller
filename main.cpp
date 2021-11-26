@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
 		 
  		else if (vecstrcmp(argv[my_arg], {"help", "Help", "--help", "-h", "-help"}) != ERROR)
 		{
-			std::cout << "Usage: lesson [SWITCHES] [FILTER]..." << std::endl
+			std::cout << "Usage: lesson [SWITCHES...] [FILTER...]" << std::endl
 				<< std::endl
 				<< "Tool to monitor and manage static timetables, like in school\n"
 				<< std::endl
@@ -130,7 +130,79 @@ int main(int argc, char *argv[])
 				<< "\t\t\t\t\t\t(e.g. lesson -d 3 1 -> First lesson three days ahead)\n"
 				<< "   lesson tomorrow/today/yesterday\t" 
 				<< "supported relative weekday displays\n"
-				<< std::endl;
+				<< std::endl
+				<< "SWITCHES\n"
+				<< std::endl
+				<< "   -t/--terse\t\t\t\t"
+				<< "makes all output terse, suited for script parsing\n"
+				<< "   -c/--no-count-empties[WIP]t\t"
+				<< "relative arguments do not count lessons that don't happen \n"
+				<< "\t\t\t\t\t\tbut the timeframes indicate that there might be one\n"
+				<< "   -H/--no-show-header\t\t\t"
+				<< "don't display the header of the timetable\n"
+				<< "   -T/--no-show-title\t\t\t"
+				<< "don't show the title of tables that are shown in some situations\n"
+				<< "\t\t\t\t\t\t(e.g. omit the \"--- Weekday ---\" or similar things)\n"
+				<< std::endl
+				<< std::endl
+				<< std::endl
+				<< "WRITING YOUR OWN TIMETABLE\n"
+				<< "This section teaches you how to write your own datafile"
+				<< " for the program to use.\n"
+				<< "Don't worry, it's easy!\n"
+				<< std::endl
+				<< "1.   Find your config file\n"
+				<< "     Your config file is either located at"
+				<< " $XDG_CONFIG_HOME/lesson-controller/config.conf,\n"
+				<< "     the $LESSON_CONFIG environment variable,"
+				<< " or ~/.config/lesson-controller/config.conf\n"
+				<< "2.   Find your data location in the config file\n"
+				<< "     The variables LESSON_FILE_LOC and TIME_FILE_LOC"
+				<< " set the location of your datafiles.\n"
+				<< "     If these files don't exist, create them.\n"
+				<< "3.   Syntax of your timeframe file:\n"
+				<< "     The timeframe file sets, when your lessons start.\n"
+				<< "     AT THE MOMENT, PAUSES BETWEEN LESSONS ARE UNFORTUNATELY NOT POSSIBLE.\n"
+				<< "     Between two braces ({}), there is another set of braces for each"
+				<< " timestamp.\n"
+				<< "     In this other set, write the time, separated by a double colon, e.g. 7:45\n"
+				<< "     Example timeframe file:\n"
+				<< std::endl
+				<< "     { # The minutes your lessons start every day\n"
+				<< "     \t{7:45} {8:35} {9:35} {10:25} {11:25} {12:10} {12:55}\n"
+				<< "     }\n"
+				<< "4.   Syntax of your lessondata file:\n"
+				<< "     Similar to the timeframe file, put everything into two braces ({})\n"
+				<< "     Then, for every day, starting with sunday, there are seven braces\n"
+				<< "     in which you can write the metadata for as many lessons as you have timeframes.\n"
+				<< "     The metadata is located in more braces and follows this syntax:\n"
+				<< "     {SUBJECT, TEACHER, ROOM}\n"
+				<< "     You can mark free lessons with empty braces without commata [WIP]\n"
+				<< "     Example lessondata file:\n"
+				<< "     {\n"
+				<< "        { # Sunday\n"
+				<< "        }\n"
+				<< std::endl
+				<< "        { # Monday\n"
+				<< "            { Maths, Smith, 666 } # Maths, with teacher Smith in room 666\n"
+				<< "            {} # An empty lesson\n"
+				<< "            { Computer_Science, Britta_Britt, My_favorite_room } # For spaces, use underscores\n"
+				<< "                 # Underscores are converted to spaces, spaces themselves are not supported\n"
+				<< "        }\n"
+				<< "     }\n"
+				<< "     You don't need braces for every weekday,\n"
+				<< "     however, some issues might arise at the moment.\n"
+				<< std::endl
+				<< "YOU DON'T NEED TO UNDERSTAND THIS:\n"
+				<< "If you installed the program with 'make install', stock/example config and data files\n"
+				<< "should have been created under ~/.config/lesson-controller/\n"
+				<< "You can also create these stock data files at any time using 'lesson --create' (or 'lesson --reset')\n"
+				<< "They will appear at the location given in your config file.\n"
+				<< std::endl
+				<< "Have fun using lesson-controller, but note that it is still a Work in Progress\n"
+				<< "Report any bugs to 'https://github.com/Dangertech/lesson-controller/issues'\n"
+				<< "Written by Kjell Nagel, student at STAMA, Bad Kreuznach, Germany\n"
+				;
 		}
 		// Show relative lesson (+1/+3/-5/+0)
 		else if (strncmp(argv[my_arg], "+", 1) == 0 || strncmp(argv[my_arg], "-", 1) == 0)
