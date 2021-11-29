@@ -1,5 +1,6 @@
 IDIR=.
 CC=g++
+CFLAGS=
 CONFLOC=~/.config/lesson-controller
 # Default data directory is just the config
 # dir for lesson-controller
@@ -10,11 +11,11 @@ SHELL=/bin/bash # Don't change that!
 
 # For steady recompilation of the binary
 default: main.cpp args.cpp lesson.cpp timecalc.cpp
-	$(CC) -o $(BINNAME) main.cpp timecalc.cpp lesson.cpp args.cpp -I $(IDIR)
+	$(CC) -o $(BINNAME) main.cpp timecalc.cpp lesson.cpp args.cpp -I $(IDIR) $(CFLAGS)
 
 # For a random user wanting to install the program
 install: main.cpp args.cpp lesson.cpp timecalc.cpp
-	$(CC) -o $(BINNAME) main.cpp timecalc.cpp lesson.cpp args.cpp -I $(IDIR)
+	$(CC) -o $(BINNAME) main.cpp timecalc.cpp lesson.cpp args.cpp -I $(IDIR) $(CFLAGS)
 	mkdir $(CONFLOC)
 	# Here should be the lesson --create commands later on
 	# to create default configuration locations

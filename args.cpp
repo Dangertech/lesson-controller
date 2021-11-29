@@ -307,6 +307,16 @@ std::string process_color_input(std::string col_str)
 	return C_OFF;
 }
 
+void clear_colors()
+{
+	time_color = C_OFF;
+	subject_color = C_OFF;
+	teacher_color = C_OFF;
+	room_color = C_OFF;
+	header_color = C_OFF;
+	separator_color = C_OFF;
+}
+
 int read_config()
 {
 	std::ifstream conffile(CONF_FILE_LOC);

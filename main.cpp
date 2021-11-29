@@ -63,6 +63,10 @@ int main(int argc, char *argv[])
 			table_header = false;
 		else if (strcmp(argv[my_arg], "-T") == 0 || strcmp(argv[my_arg], "--no-show-title") == 0)
 			title = false;
+		else if (strcmp(argv[my_arg], "-C") == 0 || strcmp(argv[my_arg], "--no-show-color") == 0)
+		{
+			clear_colors();
+		}
 		else if (vecstrcmp(argv[my_arg], {"help", "Help", "--help", "-h", "-help"}) != ERROR)
 		{
 			std::cout << "Usage: lesson [SWITCHES...] [FILTER...]" << std::endl
@@ -100,6 +104,9 @@ int main(int argc, char *argv[])
 				<< "   -T/--no-show-title\t\t\t"
 				<< "don't show the title of tables that are shown in some situations\n"
 				<< "\t\t\t\t\t\t(e.g. omit the \"--- Weekday ---\" or similar things)\n"
+				<< "   -C/--no-show-color\t\t\t"
+				<< "don't show the colors set in your config file\n"
+				<< "\t\t\t\t\t\t(to disable ALL colors, you have to recompile with 'CFLAGS=NO_COLOR'\n"
 				<< std::endl
 				<< std::endl
 				<< std::endl
