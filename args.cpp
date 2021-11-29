@@ -275,6 +275,24 @@ std::string convert_tilde(std::string input_string)
 	return input_string;
 }
 
+
+
+// Convert a base sixteen DIGIT to it's base 10 equivalent
+int sixteen_to_ten(char ten_str)
+{
+	ten_str = tolower(ten_str);
+	if(isalpha(ten_str))
+	{
+		if (ten_str < 103)
+			return ten_str-87;
+		else
+			// That's more than an f and not a hex code
+			return ERROR;
+	}
+	else
+		return ten_str-48;
+}
+
 std::string process_color_input(std::string col_str)
 {
 	// Remove capitalization
@@ -291,8 +309,6 @@ std::string process_color_input(std::string col_str)
 		return C_GREEN;
 	else if (col_str == "yellow")
 		return C_YELLOW;
-	else if (col_str == "green")
-		return C_GREEN;
 	else if (col_str == "blue")
 		return C_BLUE;
 	else if (col_str == "purple")
@@ -304,6 +320,25 @@ std::string process_color_input(std::string col_str)
 	// I know, this statement doesn't matter
 	else if (col_str == "off" || col_str == "none" || col_str == "no_color")
 		return C_OFF;
+	 
+	// Uh shit, User wrote a HEX code (probably, can't force # because of comments), shit's about to get hot
+	if (col_str.size() == 6)
+	{
+		// The HEX value has to be converted to RGB to then plug it into
+		// the ANSI escape sequence
+		// Maybe there's a inbuilt function, but I don't care
+		//
+		// sixteen_to_ten() converts As to a 10 and all that, so we can calculate with base 10
+		int red = sixteen_to_ten(col_str[0])*16 + sixteen_to_ten(col_str[1]);
+		int green = sixteen_to_ten(col_str[2])*16 + sixteen_to_ten(col_str[3]);
+		int blue = sixteen_to_ten(col_str[4])*16 + sixteen_to_ten(col_str[5]);
+		if (red >= 0 && red <= 255 && green >= 0 && green <= 255 && blue >= 0 && blue <= 255)
+			return "\033[38;2;" + std::to_string(red) + ";" + std::to_string(green) + ";" + std::to_string(blue) + "m";
+		else
+		{
+			return C_OFF;
+		}
+	}
 	return C_OFF;
 }
 
