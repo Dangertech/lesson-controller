@@ -601,7 +601,8 @@ int write_table()
 		<< "# The file is reset every time the program performs a write operation (Right now, at every successful termination)" << std::endl
 		<< "# You have to enclose every day in curly brackets and every lesson in every day as well." << std::endl
 		<< "# The 3 Metadata that are stored (Subject, Teacher and Room) must be separated by commata." << std::endl
-		<< "# Right now, you see the stock configuration. To reset to it when you messed up, run: 'lesson --reset-data'. All your data will be lost." << std::endl;
+		<< "# To reset this file when you messed up, run: 'lesson --reset-data'. All your data will be lost." << std::endl
+		<< "# This also gives a comprehensive tutorial about this file." << std::endl;
 	 
 	lessonfile << "{ # Your timetable" << std::endl;
 	lessonfile << tabs(1) << " " << std::endl;

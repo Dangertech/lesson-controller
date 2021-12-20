@@ -17,11 +17,16 @@ default: main.cpp args.cpp lesson.cpp timecalc.cpp
 install: main.cpp args.cpp lesson.cpp timecalc.cpp
 	$(CC) -o $(BINNAME) main.cpp timecalc.cpp lesson.cpp args.cpp -I $(IDIR) $(CFLAGS)
 	mkdir $(CONFLOC)
-	# Here should be the lesson --create commands later on
-	# to create default configuration locations
 	touch $(CONFLOC)/config.conf
-	touch $(DATALOC)/timeframes.dat
-	touch $(DATALOC)/lessondata.dat
+	echo "# The lesson-controller configuration file" > $(CONFLOC)/config.conf
+	echo " " >> $(CONFLOC)/config.conf
+	echo "# The location of the lessondata file" >> $(CONFLOC)/config.conf
+	echo "LESSON_FILE_LOC = ~/.config/lesson-controller/lessondata.dat" >> $(CONFLOC)/config.conf
+	echo " " >> $(CONFLOC)/config.conf
+	echo "# The location of the timeframes file" >> $(CONFLOC)/config.conf
+	echo "TIME_FILE_LOC = ~/.config/lesson-controller/timeframes.dat" >> $(CONFLOC)/config.conf
+	 
+	lesson --create
 
 # For resetting all files
 reset: 
@@ -31,10 +36,16 @@ reset:
 	mkdir $(CONFLOC)
 	# Replace with lesson --create-config
 	touch $(CONFLOC)/config.conf
+	echo "# The lesson-controller configuration file" > $(CONFLOC)/config.conf
+	echo " " >> $(CONFLOC)/config.conf
+	echo "# The location of the lessondata file" >> $(CONFLOC)/config.conf
+	echo "LESSON_FILE_LOC = ~/.config/lesson-controller/lessondata.dat" >> $(CONFLOC)/config.conf
+	echo " " >> $(CONFLOC)/config.conf
+	echo "# The location of the timeframes file" >> $(CONFLOC)/config.conf
+	echo "TIME_FILE_LOC = ~/.config/lesson-controller/timeframes.dat" >> $(CONFLOC)/config.conf
 	 
 	if [ ! -d $(DATALOC) ]; then \
 		mkdir $(DATALOC); \
 	fi
-	# Replace with lesson --create-timeframes and --create-lessondata
-	touch $(DATALOC)/timeframes.dat 
-	touch $(DATALOC)/lessondata.dat
+	 
+	lesson --create

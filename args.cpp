@@ -5,6 +5,8 @@
 #include <string.h>
 #include <fstream>
 #include <ctype.h>
+#include <climits>
+#include <limits>
 #include "lesson.h"
 #include "timecalc.h"
 #include "args.h"
@@ -216,6 +218,207 @@ void show_week()
 		  << "to have a substitute." << std::endl;
 }
 
+void show_help()
+{
+	std::cout << "Usage: lesson [SWITCHES...] [FILTER...]" << std::endl
+		<< std::endl
+		<< "Tool to monitor and manage static timetables, like in school\n"
+		<< std::endl
+		<< "WARNING: THIS HELP TEXT CONTAINS FEATURES THAT ARE YET TO BE IMPLEMENTED\n"
+		<< std::endl
+		<< "FILTERS\n"
+		<< "A filter can be a weekday, a specific lesson, or a relative lesson\n"
+		<< std::endl
+		<< "   lesson monday/tuesday, etc...\t"
+		<< "show all lessons registered on this weekday\n"
+		<< "   lesson +n\t\t\t\t"
+		<< "show the lesson n lessons ahead of the current one\n"
+		<< "   lesson -n\t\t\t\t"
+		<< "show the lesson n lessons back of the current one\n"
+		<< "   lesson -d n\t\t\t\t"
+		<< "show the day n days from this one;\n"
+		<< "\t\t\t\t\t\tcan be negative;\n"
+		<< "\t\t\t\t\t\tcan be augmented with a specific lesson number\n"
+		<< "\t\t\t\t\t\t(e.g. lesson -d 3 1 -> First lesson three days ahead)\n"
+		<< "   lesson tomorrow/today/yesterday\t" 
+		<< "supported relative weekday displays\n"
+		<< std::endl
+		<< "SWITCHES\n"
+		<< std::endl
+		<< "   -t/--terse\t\t\t\t"
+		<< "makes all output terse, suited for script parsing\n"
+		<< "   -c/--no-count-empties[WIP]\t"
+		<< "relative arguments do not count lessons that don't happen \n"
+		<< "\t\t\t\t\t\tbut the timeframes indicate that there might be one\n"
+		<< "   -H/--no-show-header\t\t\t"
+		<< "don't display the header of the timetable\n"
+		<< "   -T/--no-show-title\t\t\t"
+		<< "don't show the title of tables that are shown in some situations\n"
+		<< "\t\t\t\t\t\t(e.g. omit the \"--- Weekday ---\" or similar things)\n"
+		<< "   -C/--no-show-color\t\t\t"
+		<< "don't show the colors set in your config file\n"
+		<< "\t\t\t\t\t\t(to disable ALL colors, you have to recompile with 'CFLAGS=NO_COLOR'\n"
+		<< std::endl
+		<< std::endl
+		<< std::endl
+		<< "WRITING YOUR OWN TIMETABLE\n"
+		<< "This section teaches you how to write your own datafile"
+		<< " for the program to use.\n"
+		<< "Don't worry, it's easy!\n"
+		<< std::endl
+		<< "1.   Find your config file\n"
+		<< "     Your config file is either located at"
+		<< " $XDG_CONFIG_HOME/lesson-controller/config.conf,\n"
+		<< "     the $LESSON_CONFIG environment variable,"
+		<< " or ~/.config/lesson-controller/config.conf\n"
+		<< "2.   Find your data location in the config file\n"
+		<< "     The variables LESSON_FILE_LOC and TIME_FILE_LOC"
+		<< " set the location of your datafiles.\n"
+		<< "     If these files don't exist, create them.\n"
+		<< "3.   Syntax of your timeframe file:\n"
+		<< "     The timeframe file sets, when your lessons start.\n"
+		<< "     AT THE MOMENT, PAUSES BETWEEN LESSONS ARE UNFORTUNATELY NOT POSSIBLE.\n"
+		<< "     Between two braces ({}), there is another set of braces for each"
+		<< " timestamp.\n"
+		<< "     In this other set, write the time, separated by a double colon, e.g. 7:45\n"
+		<< "     Example timeframe file:\n"
+		<< std::endl
+		<< "     { # The minutes your lessons start every day\n"
+		<< "     \t{7:45} {8:35} {9:35} {10:25} {11:25} {12:10} {12:55}\n"
+		<< "     }\n"
+		<< "4.   Syntax of your lessondata file:\n"
+		<< "     Similar to the timeframe file, put everything into two braces ({})\n"
+		<< "     Then, for every day, starting with sunday, there are seven braces\n"
+		<< "     in which you can write the metadata for as many lessons as you have timeframes.\n"
+		<< "     The metadata is located in more braces and follows this syntax:\n"
+		<< "     {SUBJECT, TEACHER, ROOM}\n"
+		<< "     You can mark free lessons with empty braces without commata [WIP]\n"
+		<< "     Example lessondata file:\n"
+		<< "     {\n"
+		<< "        { # Sunday\n"
+		<< "        }\n"
+		<< std::endl
+		<< "        { # Monday\n"
+		<< "            { Maths, Smith, 666 } # Maths, with teacher Smith in room 666\n"
+		<< "            {} # An empty lesson\n"
+		<< "            { Computer_Science, Britta_Britt, My_favorite_room } # For spaces, use underscores\n"
+		<< "                 # Underscores are converted to spaces, spaces themselves are not supported\n"
+		<< "        }\n"
+		<< "     }\n"
+		<< "     You don't need braces for every weekday,\n"
+		<< "     however, some issues might arise at the moment.\n"
+		<< std::endl
+		<< "YOU DON'T NEED TO UNDERSTAND THIS:\n"
+		<< "If you installed the program with 'make install', stock/example config and data files\n"
+		<< "should have been created under ~/.config/lesson-controller/\n"
+		<< "You can also create these stock data files at any time using 'lesson --create' (or 'lesson --reset')\n"
+		<< "They will appear at the location given in your config file.\n"
+		<< std::endl
+		<< "Have fun using lesson-controller, but note that it is still a Work in Progress\n"
+		<< "Report any bugs to 'https://github.com/Dangertech/lesson-controller/issues'\n"
+		<< "Written by Kjell Nagel, student at STAMA, Bad Kreuznach, Germany\n"
+	;
+}
+
+bool query_reset(std::string file_loc, bool ask) // Ask is true by default
+{
+	if (ask)
+	{
+		std::cout << "Do you really want to reset the file at the location ["
+			<< C_GREEN_U << file_loc << C_OFF << "]? " 
+			<< std::endl
+			<< "You might lose data! [Y/n] ";
+		 
+		char response;
+		std::cin >> response;
+		 
+		// Flush cin
+		std::cin.clear();
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		
+		std::cout << "Response:" << response << "!" << std::endl;
+		if (response != 'y')
+		{
+			std::cout << "Aborting file reset!" << std::endl;
+			return false;
+		}
+	}
+	 
+	std::ofstream file(file_loc);
+	if (file.is_open())
+	{
+		if (file_loc == LESSON_FILE_LOC)
+		{
+			file << "# This is the location where the data about your lessons is stored." << std::endl
+				 << "# It is designed to be human readable so that you can easily edit it," << std::endl
+				 << "# but note that in the future, there are plans to have arguments that let you edit your lessons with lesson-controller itself." << std::endl
+				 << "# " << std::endl
+				 << "# Lesson-controller is space- and linebreak-agnostic while reading this and the timedata.dat file, so you can format it pretty much however you want, BUT:" << std::endl
+				 << "# The file is reset every time the program performs a write operation (Right now, at every successful termination)" << std::endl
+				 << "# You have to enclose every day in curly brackets and every lesson in every day as well." << std::endl
+				 << "# The 3 Metadata that are stored (Subject, Teacher and Room) must be separated by commata." << std::endl
+				 << "# Right now, you see the stock configuration. To reset to it when you messed up, run: 'lesson --reset-data'. All your data will be lost." << std::endl << std::endl;
+			
+			file << "{ #This brace marks the beginning of your timetable declaration - it is needed and tells the program to start looking for your table" << std::endl
+				 << "\t{ #In this level of braces, days are marked. Lesson-controller begins its week with sundays, so these braces mark the lessons on sunday" << std::endl
+				 << "\t\t#Subject   Teacher  Room" << std::endl
+				 << "\t\t{Religion, Grayson, Church} #This is a lesson on sunday. The subject is \"RE\", it is led by the teacher \"Grayson\" and happens in the room \"Church\"" << std::endl
+				 << "\t}" << std::endl
+				 << "\t{ #Monday" << std::endl
+				 << "\t\t{English, Hubb, 253} #This is the first lesson on Monday. A day can contain as many lessons as defined in your timeframe file" << std::endl
+				 << "\t\t{French, Lopez, GWZ-17} #The content you put between these commata can be anything that is a valid ASCII character" << std::endl
+				 << "\t\t{} # You can also leave a lesson empty, which makes the program mark the lesson as free" << std::endl
+				 << "\t\t{History, Bender, 333}" << std::endl
+				 << "\t}" << std::endl
+				 << "\t{ #Tuesday" << std::endl
+				 << "\t\t{Maths, Baerbel, 333}" << std::endl
+				 << "\t\t{       Maths,   Baerbel,   333       } # You make blank spaces as you wish, they are not recognized and the content will appear without spaces" << std::endl
+				 << "\t\t{Physical_Education, Will_Smith, Sports_Hall} # To make spaces, write underscores" << std::endl
+				 << "\t}" << std::endl
+				 << "\t{ #Wednesday" << std::endl
+				 << "\t\t " << std::endl
+				 << "\t} #A day can contain also contain zero lessons" << std::endl
+				 << "\t{ #Thursday" << std::endl
+				 << "\t\t " << std::endl
+				 << "\t}" << std::endl
+				 << "\t" << std::endl
+				 << "\t{ #Friday" << std::endl
+				 << "\t\t " << std::endl
+				 << "\t}" << std::endl
+				 << "\t{ #Saturday" << std::endl
+				 << "\t\t " << std::endl
+				 << "\t}" << std::endl
+				 << "}" << std::endl;
+		}
+		else if (file_loc == TIME_FILE_LOC)
+		{
+			file << "# This is the location where the data about the beginning of your lessons is stored." << std::endl
+				 << "# lesson-controller orients itself solely on the BEGINNING of lessons: " << std::endl
+				 << "# To calculate when a lesson is taking place, it uses the timeframe of the beginning of this lesson and the timeframe of the next one." << std::endl
+				 << "# Because of this, you can't mark short breaks between lessons (though you can mark free lessons by leaving it empty)" << std::endl
+				 << "# To reset this file when you messed up, use 'lesson --reset-timeframes'" << std::endl
+				 << std::endl;
+			file << "{ #The declaration of your timeframe file has to be enclosed in braces." << std::endl
+				 << "\t{7:45} #This is the start of the first lesson" << std::endl
+				 << "\t{8:35} #The beginning of the second lesson;" << std::endl
+				 << "\t# Although there might be a break between the first and the second lesson," << std::endl
+				 << "\t# lesson-controller still counts it as starting at 7:45 and ending at 8:35, where the second lesson begins." << std::endl
+				 << "\t{9:35} #You can only use numbers, separated by a colon, to denote the timeframes." << std::endl
+				 << "\t{10:35} #You can only have as many lessons in a day (described in your lessondata file) as you have timeframes!" << std::endl
+				 << "}" << std::endl;
+		}
+		else
+		{
+			file << "The software 'lesson-controller' was told to initiate a reset of this file," << std::endl
+				 << "but it couldn't recognize it as one of its datafiles. Please report this bug under" << std::endl
+				 << "https://github.com/Dangertech/lesson-controller/issues/new" << std::endl
+				 << "Please excuse any inconveniences this might have caused." << std::endl;
+		}
+		file.close();
+		return true;
+	}
+	return false;
+}
 
 //////// CONFIG FILE PARSING
 

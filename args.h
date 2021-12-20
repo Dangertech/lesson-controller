@@ -20,6 +20,7 @@ extern bool count_empties; // Should empty lessons in the timetable be counted w
 
 // Variables that store how the program should
 // respond to an error
+// e.g. only write data if write_data == true
 extern bool write_data;
 extern bool print_timeframe_loc;
 extern bool print_lessondata_loc;
@@ -74,6 +75,11 @@ void rel_lesson(int);
 
 void show_week(); // Show the whole week
 
+void show_help();
+
+bool query_reset(std::string file, bool ask = true); // Resets the given file
+// if ask is true, it asks the user if they want to reset the file before commencing.
+// Returns true if the operation was completed, false if not
 
 // CONFIG FILE PARSING
 
