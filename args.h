@@ -60,6 +60,8 @@ void print_errors();
 
 int int_length(int);
 
+// Takes a C string and a vector of std::strings, gives the position
+// of the c string in the vector, ERROR if the vector doesn't contain it
 int vecstrcmp (const char* string, std::vector <std::string>);
 
 std::string cap(std::string); // Capitalize the first letter in a string

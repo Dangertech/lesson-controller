@@ -64,13 +64,9 @@ int main(int argc, char *argv[])
 		else if (strcmp(argv[my_arg], "-T") == 0 || strcmp(argv[my_arg], "--no-show-title") == 0)
 			title = false;
 		else if (strcmp(argv[my_arg], "-C") == 0 || strcmp(argv[my_arg], "--no-show-color") == 0)
-		{
 			clear_colors();
-		}
 		else if (vecstrcmp(argv[my_arg], {"help", "Help", "--help", "-h", "-help"}) != ERROR)
-		{
 			show_help();
-		}
 		// Reset datafiles
 		else if (strcmp(argv[my_arg], "--create") == 0)
 		{
@@ -89,7 +85,6 @@ int main(int argc, char *argv[])
 			query_reset(TIME_FILE_LOC, false);
 			return 0;
 		}
-
 		else if (strcmp(argv[my_arg], "--reset") == 0)
 		{
 			query_reset(LESSON_FILE_LOC);
@@ -145,15 +140,23 @@ int main(int argc, char *argv[])
 		char* test_day = argv[my_arg];
 		for (int i = 0; i<strlen(argv[my_arg]); i++)
 			test_day[i] = tolower(test_day[i]);
-		int weekday_check = vecstrcmp(test_day, weekdays); 
 		 
 		// Execute actions based on arguments
-		// Currently only incorporates the first argument, 
-		// needs to be loop for all in the future
-		
-		if (weekday_check != ERROR) // Show timetable of given weekday
-			show_single_day(weekday_check);
-		 
+		int relday_check = vecstrcmp(argv[my_arg], {"yesterday", "today", "tomorrow"});
+		// Show timetable of given weekday
+		if (vecstrcmp(test_day, weekdays) != ERROR) 
+			show_single_day(vecstrcmp(test_day, weekdays));
+		else if ( relday_check != ERROR)
+		{
+			int show;
+			if (relday_check == 0)
+				show = day-1;
+			else if (relday_check == 1)
+				show = day;
+			else if (relday_check == 2)
+				show = day+1;
+			show_single_day(show);
+		}
 		// Show relative lesson (+1/+3/-5/+0)
 		else if (strncmp(argv[my_arg], "+", 1) == 0 || strncmp(argv[my_arg], "-", 1) == 0)
 		{
@@ -164,9 +167,6 @@ int main(int argc, char *argv[])
 		}
 		else if (strcmp(argv[my_arg], "0") == 0)
 			rel_lesson(atoi(argv[my_arg]));
-		else if (strcmp(argv[my_arg], "time") == 0) // Only meant for debug
-			std::cout << "Current time: " << hour << ":" << minute << std::endl;
-		 
 		else
 		{
 			std::cout << "Invalid argument '" << argv[my_arg] << "'" << std::endl
