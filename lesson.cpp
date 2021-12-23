@@ -67,24 +67,66 @@ std::string construct_table_header(int subj_size, int teach_size, int room_size)
 {
 	std::string header;
 	header += header_color;
-	header += "=TIME=";
-	for (int i = 0; i<spacing+1+spacing; i++) // ===SUBJECT
-		header += "=";                        //  | English
 	header += "SUBJECT";
 	// Fill up until TEACHER
-	for (int i = header.size(); i<5+spacing+1+spacing+subj_size+spacing+1+spacing; i++)
+	for (int i = 0; i<subj_size - std::string("SUBJECT").size() + spacing + 1 + spacing; i++)
 		header += "=";
 	header += "TEACHER";
 	// Fill up until ROOM
-	for (int i = header.size(); i<7+spacing*4+subj_size+teach_size+spacing+1+spacing; i++)
+	for (int i = 0; i<teach_size - std::string("TEACHER").size() + spacing + 1 + spacing; i++)
 		header += "=";
 	header += "ROOM";
 	// If the room name is long, extend the header
-	for (int i = header.size(); i<8+spacing*6+subj_size+teach_size+room_size+1; i++)
+	for (int i = 0; i<room_size - std::string("ROOM").size() + 1; i++)
 		header += "=";
 	header += C_OFF;
 	return header;
 }
+
+std::string sep()
+{
+	std::string sep;
+	if (!terse)
+	{
+		sep += separator_color;
+		for (int i = 0; i<spacing; i++)
+			sep += " ";
+		sep += "|";
+		for (int i = 0; i<spacing; i++)
+			sep += " ";
+	}
+	else
+		sep += "/";
+	sep += C_OFF;
+	return sep;
+}
+
+std::string construct_row(lesson l, int subj_size, int teach_size, int room_size)
+{
+	std::string row;
+	row += l.subject;
+	if (!terse)
+	{
+		for (int i = row.size(); i<subj_size; i++)
+			row += " ";
+	}
+	row += sep();
+	row += l.teacher;
+	if (!terse)
+	{
+		for (int i = row.size(); i<subj_size+sep().size()+teach_size; i++)
+			row += " ";
+	}
+	row += sep();
+	row += l.room;
+	if (!terse)
+	{
+		for (int i = row.size(); i<subj_size+teach_size+sep().size()*2+room_size; i++)
+			row += " ";
+	}
+	return row;
+}
+
 
 void show_lessons(std::vector < std::vector <std::pair<int, int> >> to_show)
 {
@@ -120,20 +162,64 @@ void show_lessons(std::vector < std::vector <std::pair<int, int> >> to_show)
 			}
 		}
 	}
-	/*
 	std::cout << "Max subject size: " << m_subj_size << std::endl
 		<< "Max teacher size: " << m_teach_size << std::endl
 		<< "Max room size: " << m_room_size << std::endl;
-	*/
 	 
 	// PRINT TABLE HEADERS
-	for (int i = 0; i<get_largest_row(to_show); i++)
+	if (!terse)
 	{
-		std::cout << construct_table_header(m_subj_size, m_teach_size, m_room_size) << " ";
+		std::cout << header_color << "=TIME=";
+		for (int i = 0; i<spacing+1+spacing; i++)
+			std::cout << "=";
+		for (int i = 0; i<get_largest_row(to_show); i++)
+		{
+			std::cout << construct_table_header(m_subj_size, m_teach_size, m_room_size) 
+				<< header_color << "=" << C_OFF;
+		}
+		std::cout << std::endl;
 	}
-	std::cout << std::endl;
 	 
 	// PRINT GIVEN ENTRIES
+	for (int i = 0; i<to_show.size(); i++)
+	{
+		// Prefix with time
+		std::string hour, minute;
+		if (i < timeframes.size())
+		{
+			hour = std::to_string(timeframes[i].first);
+			minute = std::to_string(timeframes[i].second);
+		}
+		else
+		{
+			hour = "!";
+			minute = "!";
+		}
+		 
+		if (!terse)
+		{
+			std::cout << "[" << hour << ":" << minute << "]";
+			for (int s = 0; s<spacing; s++)
+				std::cout << " ";
+			std::cout << "|";
+			for (int s = 0; s<spacing; s++)
+				std::cout << " ";
+		}
+		else
+			std::cout << hour << ":" << minute << "/";
+		 
+		for (int j = 0; j<to_show[i].size(); j++)
+		{
+			// Print the row(s) of lessons
+			lesson this_lesson;
+			if (to_show[i][j].second < table[to_show[i][j].first].size())
+				this_lesson = table[to_show[i][j].first][to_show[i][j].second];
+			else
+				this_lesson = {"", "", ""};
+			std::cout << construct_row(this_lesson, m_subj_size, m_teach_size, m_room_size);
+		}
+		std::cout << std::endl;
+	}
 }
 
 int get_lesson(int c_hour, int c_minute) // Get the current lesson

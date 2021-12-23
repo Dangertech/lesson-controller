@@ -24,12 +24,7 @@ int main(int argc, char *argv[])
 	int timeread = read_timeframes(); // Read the timeframes from the file specified in lesson.h
 	int lessonread = read_lessondata();
 
-	if (timeread == ERR_NONEXISTENT_FILE && lessonread == ERR_NONEXISTENT_FILE)
-	{
-		// User probably started the application for the first time
-		// Tell the user to do lesson --create
-	}
-	else if (timeread == ERR_NONEXISTENT_FILE)
+	if (timeread == ERR_NONEXISTENT_FILE)
 	{
 		queue_error(std::string(C_RED_B) + "There is no timeframe datafile "
 								+ "at your data location given in the config file;\n"
@@ -39,7 +34,7 @@ int main(int argc, char *argv[])
 								+ "config file to the appropriate one;" 
 								+ std::string(C_OFF), true, "timeframes");
 	}
-	else if (lessonread == ERR_NONEXISTENT_FILE)
+	if (lessonread == ERR_NONEXISTENT_FILE)
 	{
 		queue_error(std::string(C_RED_B) + "There is no lessondata file "
 					+ "at your data location given in the config file;\n"
@@ -50,15 +45,6 @@ int main(int argc, char *argv[])
 					+ std::string(C_OFF), true, "lessondata");
 	}
 	 
-	// TO TEST THE NEW show_lessons() FUNCTION, REMOVE AT MERGE!!!
-	std::vector <std::vector <std::pair<int,int>>> test =
-	{
-		{ {0,0},{1,0},{2,0} },
-		{ {0,1},{1,1},{2,1} },
-		{ {0,2},{1,2},{2,2} }
-	};
-	show_lessons(test);
-	return 0;
 	///// Get config arguments
 	 
 	for (int my_arg = 1; my_arg < argc; my_arg++)
@@ -126,6 +112,15 @@ int main(int argc, char *argv[])
 				+ "for every lesson in the timetable" + std::string(C_OFF));
 	}
 	
+	// TO TEST THE NEW show_lessons() FUNCTION, REMOVE AT MERGE!!!
+	std::vector <std::vector <std::pair<int,int>>> test =
+	{
+		{ {0,0},{1,0},{2,0} },
+		{ {0,1},{1,1},{2,1} },
+		{ {0,2},{1,2},{2,2} }
+	};
+	show_lessons(test);
+	return 0;
 	 
 	// If there are no arguments, show the week and exit
 	if (argc == 1)
