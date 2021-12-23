@@ -46,7 +46,45 @@ void show_single_day (int my_day)
 	show_lessons(day_vector);
 }
 
+// STUFF FOR SHOW_LESSONS
+
 bool table_header = true;
+int spacing = 1;
+
+int get_largest_row(std::vector < std::vector <std::pair<int,int>> > vec)
+{
+	int largest_sub = 0;
+	for (int i = 0; i<vec.size(); i++)
+	{
+		if (vec[i].size() > largest_sub)
+			largest_sub = vec[i].size();
+	}
+	return largest_sub;
+}
+
+// Computes a string for a header with the given content metadata
+std::string construct_table_header(int subj_size, int teach_size, int room_size)
+{
+	std::string header;
+	header += header_color;
+	header += "=TIME=";
+	for (int i = 0; i<spacing+1+spacing; i++) // ===SUBJECT
+		header += "=";                        //  | English
+	header += "SUBJECT";
+	// Fill up until TEACHER
+	for (int i = header.size(); i<5+spacing+1+spacing+subj_size+spacing+1+spacing; i++)
+		header += "=";
+	header += "TEACHER";
+	// Fill up until ROOM
+	for (int i = header.size(); i<7+spacing*4+subj_size+teach_size+spacing+1+spacing; i++)
+		header += "=";
+	header += "ROOM";
+	// If the room name is long, extend the header
+	for (int i = header.size(); i<8+spacing*6+subj_size+teach_size+room_size+1; i++)
+		header += "=";
+	header += C_OFF;
+	return header;
+}
 
 void show_lessons(std::vector < std::vector <std::pair<int, int> >> to_show)
 {
@@ -55,16 +93,45 @@ void show_lessons(std::vector < std::vector <std::pair<int, int> >> to_show)
 	{
 		int day = to_show[0][0].first, lesson = to_show[0][0].second;
 		if (day > table.size() 
-				|| lesson > table[day].size())
+				|| lesson >= table[day].size())
+		{
 			std::cout << "Lesson " << lesson+1 << " on " 
 				<< cap(weekdays[day]) << " does not exist " << std::endl;
+			return;
+		}
 	}
-	 
 	// GET NEEDED MAXIMUM SIZES
-	
+	int m_subj_size = 0, m_teach_size = 0, m_room_size = 0;
+	for (int i = 0; i<to_show.size(); i++)
+	{
+		for (int j = 0; j<to_show[i].size(); j++)
+		{
+			// Avoid crash in case function is called incorrectly
+			if (to_show[i][j].second < table[to_show[i][j].first].size())
+			{
+				lesson comp = table[to_show[i][j].first][to_show[i][j].second];
+				 
+				if (comp.subject.size() > m_subj_size)
+					m_subj_size = comp.subject.size();
+				if (comp.teacher.size() > m_teach_size)
+					m_teach_size = comp.teacher.size();
+				if (comp.room.size() > m_room_size)
+					m_room_size = comp.room.size();
+			}
+		}
+	}
+	/*
+	std::cout << "Max subject size: " << m_subj_size << std::endl
+		<< "Max teacher size: " << m_teach_size << std::endl
+		<< "Max room size: " << m_room_size << std::endl;
+	*/
 	 
 	// PRINT TABLE HEADERS
-	
+	for (int i = 0; i<get_largest_row(to_show); i++)
+	{
+		std::cout << construct_table_header(m_subj_size, m_teach_size, m_room_size) << " ";
+	}
+	std::cout << std::endl;
 	 
 	// PRINT GIVEN ENTRIES
 }

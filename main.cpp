@@ -50,7 +50,15 @@ int main(int argc, char *argv[])
 					+ std::string(C_OFF), true, "lessondata");
 	}
 	 
-	
+	// TO TEST THE NEW show_lessons() FUNCTION, REMOVE AT MERGE!!!
+	std::vector <std::vector <std::pair<int,int>>> test =
+	{
+		{ {0,0},{1,0},{2,0} },
+		{ {0,1},{1,1},{2,1} },
+		{ {0,2},{1,2},{2,2} }
+	};
+	show_lessons(test);
+	return 0;
 	///// Get config arguments
 	 
 	for (int my_arg = 1; my_arg < argc; my_arg++)
