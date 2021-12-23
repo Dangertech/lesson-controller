@@ -37,12 +37,11 @@ void show_single_day (int my_day)
 		return;
 	}
 	 
-	std::vector < std::pair <int,int> > day_vector;
+	std::vector < std::vector <std::pair <int,int> >> day_vector;
+	day_vector.push_back(std::vector <std::pair<int,int>>());
 	for (int i = 0; i<table[my_day].size(); i++)
 	{
-		day_vector.push_back( std::make_pair(my_day, i) );
-		if (i < table[my_day].size() -1)
-			day_vector.push_back( std::make_pair(-1, -1) );
+		day_vector[0].push_back( std::make_pair(my_day, i) );
 	}
 	show_lessons(day_vector);
 }
@@ -134,11 +133,12 @@ bool table_header = true;
 // Show data for any lessons
 // Takes a vector of pairs with days and lesson numbers
 // Prints a table to stdout with the given lessons
-void show_lessons(std::vector < std::pair<int, int> > to_show)
+void show_lessons(std::vector < std::vector <std::pair<int, int> >> to_show)
 {
 	x_pos = 0; // Reset X Position in case the user queries another day; Without this,
 		   // the spacing of the first row would be messed up
 	// Get how big the table cells should be
+	/*
 	for (int i = 0; i < to_show.size(); i++)
 	{
 		int day = to_show[i].first;
@@ -260,6 +260,7 @@ void show_lessons(std::vector < std::pair<int, int> > to_show)
 				  <<  cap(weekdays[day]) << " does not exist!" << std::endl;
 		}
 	}
+	*/
 }
 
 int get_lesson(int c_hour, int c_minute) // Get the current lesson

@@ -28,7 +28,7 @@ extern bool title;
 void show_single_day(int);
 
 extern bool table_header; // Track if a table header should be shown
-void show_lessons(std::vector < std::pair<int, int> >); // Show a range of lessons given in the vector of pairs
+void show_lessons(std::vector < std::vector <std::pair<int, int>> >); // Show a range of lessons given in the vector of pairs
 // The first item in the pair is the day, the second the lesson
 
 int get_lesson(int, int); // Get the lesson at the given time (int, int)
