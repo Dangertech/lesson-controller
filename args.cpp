@@ -207,7 +207,7 @@ void rel_lesson(int to_skip)
 			  << " on "
 			  << cap(weekdays[targeted_day]) << ":" << std::endl;
 	 
-	show_lessons({ {{targeted_day, targeted_lesson }} });
+	show_lessons({ {{targeted_day, targeted_lesson}} });
 }
 
 void show_week()

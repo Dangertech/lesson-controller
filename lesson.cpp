@@ -46,221 +46,27 @@ void show_single_day (int my_day)
 	show_lessons(day_vector);
 }
 
-
-
-
-///// All this leads up to show_lessons
-//
-int spacing = 1;
-int time_size = 8, subj_size, teach_size, room_size;
-int x_pos;
-
-
-void print_chars(const char* my_char, int num_of_spaces) // [Internal only]
-{
-	for (int i = 0; i<num_of_spaces; i++)
-	{
-		std::cout << my_char;
-	}
-}
-
-void terse_space(int custom_spaces) // [Internal only], used for show_lessons
-{
-	if (terse == false)
-	{
-		// Make spaces according to the input argument given
-		print_chars(" ", custom_spaces);
-		x_pos += custom_spaces;
-		std::cout << separator_color << "|" << C_OFF;
-		x_pos++;
-		// Make spacing spaces
-		print_chars(" ",spacing);
-		x_pos += spacing;
-	}
-	else
-		std::cout << "/";
-}
-
-void print_header()
-{
-	x_pos = 0;
-	// Store the x position where the table headers should start
-	// Just to make my head hurt less
-	int des_pos; 
-	
-	// Print in header_color from config file
-	std::cout << header_color;
-	 
-	std::cout << "=TIME";
-	x_pos += 5;
-	 
-	des_pos = time_size+spacing;
-	 
-	print_chars("=", des_pos-x_pos-1);
-	x_pos += des_pos-x_pos-1;
-	 
-	std::cout << "SUBJECT";
-	x_pos += 7;
-	
-	des_pos = time_size+spacing+subj_size+spacing+1+spacing;
-	 
-	print_chars("=", des_pos - x_pos - 1);
-	x_pos += des_pos - x_pos - 1;
-	 
-	std::cout << "TEACHER";
-	x_pos += 7;
-	 
-	des_pos += teach_size + spacing + 1 + spacing;
-	 
-	print_chars("=", des_pos - x_pos - 1);
-	x_pos += des_pos - x_pos - 1;
-	 
-	std::cout << "ROOM";
-	x_pos += 4;
-	 
-	des_pos += room_size;
-	print_chars("=", des_pos - x_pos - 1);
-	 
-	std::cout << std::endl;
-	x_pos = 0;
-	
-	std::cout << C_OFF;
-}
-
-
 bool table_header = true;
 
-// Show data for any lessons
-// Takes a vector of pairs with days and lesson numbers
-// Prints a table to stdout with the given lessons
 void show_lessons(std::vector < std::vector <std::pair<int, int> >> to_show)
 {
-	x_pos = 0; // Reset X Position in case the user queries another day; Without this,
-		   // the spacing of the first row would be messed up
-	// Get how big the table cells should be
-	/*
-	for (int i = 0; i < to_show.size(); i++)
+	// If it's only a single lesson, you can show a sophisticated info
+	if (to_show.size() == 1 && to_show[0].size() == 1 && !terse)
 	{
-		int day = to_show[i].first;
-		int lesson = to_show[i].second;
-		if (day == -1 || lesson == -1)
-			continue;
-		if (table.size() > day && table[day].size() > lesson)
-		{
-			if (subj_size < table[day][lesson].subject.length())
-				subj_size = table[day][lesson].subject.length();
-			if (teach_size < table[day][lesson].teacher.length())
-				teach_size = table[day][lesson].teacher.length();
-			if (room_size < table[day][lesson].room.length())
-				room_size = table[day][lesson].room.length();
-		}
-		// Ugly but works just fine for only three variables
+		int day = to_show[0][0].first, lesson = to_show[0][0].second;
+		if (day > table.size() 
+				|| lesson > table[day].size())
+			std::cout << "Lesson " << lesson+1 << " on " 
+				<< cap(weekdays[day]) << " does not exist " << std::endl;
 	}
 	 
-	bool construct = true;
-	for (int i = 0; i < to_show.size(); i++)
-	{
-		 
-		int day = to_show[i].first;
-		int lesson = to_show[i].second;
-		 
-		if (day == -1 && lesson == -1)
-		{
-			std::cout << std::endl;
-			construct = false;
-			x_pos = 0;
-			continue;
-		}
-		 
-		 
-		if (day < table.size() && lesson < table[day].size()) // Check to avoid crashes
-		{
-			// Make the header of the table (only if terse is false of course)
-			if (construct && !terse && table_header)
-			{
-				print_header();
-			}
-			 
-			// Show time
-			if (terse == false)
-			{
-				std::cout << time_color; 
-				std::cout << "[";
-				x_pos++;
-			}
-			if (timeframes[lesson].first != 0) // Check to warn if the timeframe doesn't exist
-			{
-				std::cout << timeframes[lesson].first;
-				x_pos += int_length(timeframes[lesson].first);
-			}
-			else
-			{
-				std::cout << C_RED_B << "!" << C_OFF << time_color;
-				x_pos++;
-			}
-			 
-			std::cout << ":";
-			x_pos++;
-			if (timeframes[lesson].second != 0)
-			{
-				std::cout << timeframes[lesson].second;
-				x_pos += int_length(timeframes[lesson].second);
-			}
-			else
-			{
-				std::cout << C_RED_B << "!" << C_OFF << time_color;
-				x_pos++;
-			}
-			 
-			if (terse == false)
-			{
-				std::cout << "]"; 
-				x_pos++;
-				for (int spaces = 0; spaces < time_size+spacing-x_pos; spaces++)
-				{
-					std::cout << " ";
-					x_pos++;
-				}
-			}
-			else
-			{
-				std::cout << "/";
-				x_pos++;
-			}
-			// Time end 
-			std::cout << C_OFF; 
-			 
-			if (terse == false)
-				std::cout << subject_color;
-			std::cout << table[day][lesson].subject << C_OFF;
-			x_pos += table[day][lesson].subject.size();
-			terse_space((time_size+subj_size+spacing) - x_pos);
-			 
-			if (terse == false)
-				std::cout << teacher_color;
-			std::cout << table[day][lesson].teacher << C_OFF;
-			x_pos += table[day][lesson].teacher.size();
-			// 3* spacing bcs the spacing was applied three times up to here
-			// +1 bcs there was an additional | character
-			// I hate this calculation too, by the way
-			terse_space((time_size+subj_size+teach_size+spacing*3+1) - x_pos);
-			 
-			if (terse == false)
-				std::cout << room_color;
-			std::cout << table[day][lesson].room << C_OFF;
-			x_pos += table[day][lesson].room.size();
-			 
-			// Enforce break after the last lesson is printed
-			if (i == to_show.size() - 1)
-				std::cout << std::endl; 
-		}
-		else if (!terse)
-		{
-			std::cout << "Lesson " << lesson+1 << " on weekday " 
-				  <<  cap(weekdays[day]) << " does not exist!" << std::endl;
-		}
-	}
-	*/
+	// GET NEEDED MAXIMUM SIZES
+	
+	 
+	// PRINT TABLE HEADERS
+	
+	 
+	// PRINT GIVEN ENTRIES
 }
 
 int get_lesson(int c_hour, int c_minute) // Get the current lesson
