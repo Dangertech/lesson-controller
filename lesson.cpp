@@ -38,10 +38,10 @@ void show_single_day (int my_day)
 	}
 	 
 	std::vector < std::vector <std::pair <int,int> >> day_vector;
-	day_vector.push_back(std::vector <std::pair<int,int>>());
 	for (int i = 0; i<table[my_day].size(); i++)
 	{
-		day_vector[0].push_back( std::make_pair(my_day, i) );
+		day_vector.push_back(std::vector <std::pair<int,int>>());
+		day_vector[i].push_back( std::make_pair(my_day, i) );
 	}
 	show_lessons(day_vector);
 }
@@ -121,7 +121,7 @@ std::string construct_row(lesson l, int subj_size, int teach_size, int room_size
 	row += l.room;
 	if (!terse)
 	{
-		for (int i = row.size(); i<subj_size+teach_size+sep().size()*2+room_size; i++)
+		for (int i = row.size(); i<subj_size+teach_size+sep().size()*2+room_size+1; i++)
 			row += " ";
 	}
 	return row;
@@ -162,20 +162,22 @@ void show_lessons(std::vector < std::vector <std::pair<int, int> >> to_show)
 			}
 		}
 	}
+	/*
 	std::cout << "Max subject size: " << m_subj_size << std::endl
 		<< "Max teacher size: " << m_teach_size << std::endl
 		<< "Max room size: " << m_room_size << std::endl;
+	*/
 	 
 	// PRINT TABLE HEADERS
 	if (!terse)
 	{
 		std::cout << header_color << "=TIME=";
-		for (int i = 0; i<spacing+1+spacing; i++)
+		for (int i = 6; i<7+spacing+1+spacing; i++)
 			std::cout << "=";
 		for (int i = 0; i<get_largest_row(to_show); i++)
 		{
 			std::cout << construct_table_header(m_subj_size, m_teach_size, m_room_size) 
-				<< header_color << "=" << C_OFF;
+				<< " ";
 		}
 		std::cout << std::endl;
 	}
@@ -187,8 +189,8 @@ void show_lessons(std::vector < std::vector <std::pair<int, int> >> to_show)
 		std::string hour, minute;
 		if (i < timeframes.size())
 		{
-			hour = std::to_string(timeframes[i].first);
-			minute = std::to_string(timeframes[i].second);
+			hour = std::to_string(timeframes[to_show[i][0].second].first);
+			minute = std::to_string(timeframes[to_show[i][0].second].second);
 		}
 		else
 		{
@@ -196,17 +198,21 @@ void show_lessons(std::vector < std::vector <std::pair<int, int> >> to_show)
 			minute = "!";
 		}
 		 
+		std::string time;
 		if (!terse)
 		{
-			std::cout << "[" << hour << ":" << minute << "]";
+			time += "[" + hour + ":" + minute + "]";
+			// Make spaces for the maximum size of a time entry,
+			// e.g. "[12:55]" has 7 characters
+			for (int s = time.size(); s<7+spacing; s++)
+				time += " ";
+			time += separator_color + "|" + C_OFF;
 			for (int s = 0; s<spacing; s++)
-				std::cout << " ";
-			std::cout << "|";
-			for (int s = 0; s<spacing; s++)
-				std::cout << " ";
+				time += " ";
 		}
 		else
-			std::cout << hour << ":" << minute << "/";
+			time += hour + ":" + minute + "/";
+		std::cout << time;
 		 
 		for (int j = 0; j<to_show[i].size(); j++)
 		{
@@ -217,6 +223,7 @@ void show_lessons(std::vector < std::vector <std::pair<int, int> >> to_show)
 			else
 				this_lesson = {"", "", ""};
 			std::cout << construct_row(this_lesson, m_subj_size, m_teach_size, m_room_size);
+			std::cout << " ";
 		}
 		std::cout << std::endl;
 	}
@@ -225,7 +232,6 @@ void show_lessons(std::vector < std::vector <std::pair<int, int> >> to_show)
 int get_lesson(int c_hour, int c_minute) // Get the current lesson
 {
 	// Converts time to minutes in this day
-	// Maybe timeframes should be like that out of the box?
 	std::vector < int > conv_frames;
 	int current_minute = c_hour * 60 + c_minute;
 	for (int i=0; i<timeframes.size(); i++) // Create array of converted timeframes

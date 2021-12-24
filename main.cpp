@@ -112,6 +112,7 @@ int main(int argc, char *argv[])
 				+ "for every lesson in the timetable" + std::string(C_OFF));
 	}
 	
+	/*
 	// TO TEST THE NEW show_lessons() FUNCTION, REMOVE AT MERGE!!!
 	std::vector <std::vector <std::pair<int,int>>> test =
 	{
@@ -121,6 +122,7 @@ int main(int argc, char *argv[])
 	};
 	show_lessons(test);
 	return 0;
+	*/
 	 
 	// If there are no arguments, show the week and exit
 	if (argc == 1)
