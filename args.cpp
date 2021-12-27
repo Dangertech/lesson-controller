@@ -210,12 +210,26 @@ void rel_lesson(int to_skip)
 	show_lessons({ {{targeted_day, targeted_lesson}} });
 }
 
-void show_week()
+void show_week(int tables_per_row)
 {
-	std::cout << "Instead of this text, the whole week will be shown later on" << std::endl
-		  << "Meanwhile, you can do '" << C_GREEN_U 
-		  << "lesson monday tuesday wednesday thursday friday" << C_OFF << "'"
-		  << "to have a substitute." << std::endl;
+	std::vector <std::vector <std::pair<int,int>> > dayarr;
+	int day = 0;
+	while (day <= 7)
+	{
+		for (int row = 0; row<timeframes.size(); row++)
+		{
+			dayarr.push_back(std::vector<std::pair<int,int>>());
+			for (int cell = day; cell<day+tables_per_row; cell++)
+			{
+				if (cell >= 7)
+					break;
+				dayarr[dayarr.size()-1].push_back(std::make_pair(cell, row));
+			}
+		}
+		show_lessons(dayarr);
+		dayarr.clear();
+		day += tables_per_row;
+	}
 }
 
 void show_help()

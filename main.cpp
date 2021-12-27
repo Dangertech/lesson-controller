@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
 	// If there are no arguments, show the week and exit
 	if (argc == 1)
 	{
-		show_week();
+		show_week(2);
 		return 0;
 	}
 	

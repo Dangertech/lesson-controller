@@ -75,7 +75,7 @@ int check_timeframe_availability(); // Best name, I know
 
 void rel_lesson(int);
 
-void show_week(); // Show the whole week
+void show_week(int tables_per_row); // Show the whole week
 
 void show_help();
 
