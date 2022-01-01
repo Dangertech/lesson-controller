@@ -79,6 +79,18 @@ void print_errors()
 	error_messages.clear();
 }
 
+void print_vecvecpair(std::vector <std::vector<std::pair<int,int>>> vec)
+{
+	for (int i = 0; i<vec.size(); i++)
+	{
+		for (int j = 0; j<vec[i].size(); j++)
+		{
+			std::cout << vec[i][j].first << ", " << vec[i][j].second << "; ";
+		}
+		std::cout << std::endl;
+	}
+}
+
 // There might very well be an inbuilt solution but I don't care enough to google it
 int int_length (int integer) // That do be a lot of ints
 {
@@ -210,6 +222,8 @@ void rel_lesson(int to_skip)
 	show_lessons({ {{targeted_day, targeted_lesson}} });
 }
 
+
+
 void show_week(int tables_per_row)
 {
 	std::vector <std::vector <std::pair<int,int>> > dayarr;
@@ -218,13 +232,13 @@ void show_week(int tables_per_row)
 	{
 		for (int row = 0; row<timeframes.size(); row++)
 		{
-			dayarr.push_back(std::vector<std::pair<int,int>>());
-			for (int cell = day; cell<day+tables_per_row; cell++)
-			{
-				if (cell >= 7)
-					break;
-				dayarr[dayarr.size()-1].push_back(std::make_pair(cell, row));
-			}
+				dayarr.push_back(std::vector<std::pair<int,int>>());
+				for (int cell = day; cell<day+tables_per_row; cell++)
+				{
+					if (cell >= 7)
+						break;
+					dayarr[dayarr.size()-1].push_back(std::make_pair(cell, row));
+				}
 		}
 		show_lessons(dayarr);
 		dayarr.clear();

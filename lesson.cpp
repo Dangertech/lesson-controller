@@ -142,8 +142,15 @@ void show_lessons(std::vector < std::vector <std::pair<int, int> >> to_show)
 			return;
 		}
 	}
+	 
 	// GET NEEDED MAXIMUM SIZES
-	int m_subj_size = 0, m_teach_size = 0, m_room_size = 0;
+	
+	/* It is important that the sizes of all theses is
+	 * more than 0, or else the function will run into
+	 * an infinite loop; I'm not sure why, but it works 
+	 * now, at least.
+	 */
+	int m_subj_size = 7, m_teach_size = 7, m_room_size = 4;
 	for (int i = 0; i<to_show.size(); i++)
 	{
 		for (int j = 0; j<to_show[i].size(); j++)
@@ -171,9 +178,13 @@ void show_lessons(std::vector < std::vector <std::pair<int, int> >> to_show)
 	// PRINT TABLE HEADERS
 	if (!terse)
 	{
-		std::cout << header_color << "=TIME=";
-		for (int i = 6; i<7+spacing+1+spacing; i++)
-			std::cout << "=";
+		if (to_show.size() != 0)
+		{
+			std::cout << header_color << "=TIME=";
+			for (int i = 6; i<7+spacing+1+spacing; i++)
+				std::cout << "=";
+		}
+		 
 		for (int i = 0; i<get_largest_row(to_show); i++)
 		{
 			std::cout << construct_table_header(m_subj_size, m_teach_size, m_room_size) 
