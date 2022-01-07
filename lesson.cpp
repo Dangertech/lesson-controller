@@ -51,6 +51,31 @@ void show_single_day (int my_day)
 bool table_header = true;
 int spacing = 1;
 
+std::vector<int> get_max_sizes(std::vector < std::vector <std::pair<int,int>> > vec,
+								std::vector<int> min_sizes)
+{
+	std::vector<int> max_sizes = min_sizes;
+	for (int i = 0; i<vec.size(); i++)
+	{
+		for (int j = 0; j<vec[i].size(); j++)
+		{
+			// Avoid crash in case function is called incorrectly
+			if (vec[i][j].second < table[vec[i][j].first].size())
+			{
+				lesson comp = table[vec[i][j].first][vec[i][j].second];
+				 
+				if (comp.subject.size() > max_sizes[0])
+					max_sizes[0] = comp.subject.size();
+				if (comp.teacher.size() > max_sizes[1])
+					max_sizes[1] = comp.teacher.size();
+				if (comp.room.size() > max_sizes[2])
+					max_sizes[2] = comp.room.size();
+			}
+		}
+	}
+	return max_sizes;
+}
+
 int get_largest_row(std::vector < std::vector <std::pair<int,int>> > vec)
 {
 	int largest_sub = 0;
@@ -150,25 +175,11 @@ void show_lessons(std::vector < std::vector <std::pair<int, int> >> to_show)
 	 * an infinite loop; I'm not sure why, but it works 
 	 * now, at least.
 	 */
-	int m_subj_size = 7, m_teach_size = 7, m_room_size = 4;
-	for (int i = 0; i<to_show.size(); i++)
-	{
-		for (int j = 0; j<to_show[i].size(); j++)
-		{
-			// Avoid crash in case function is called incorrectly
-			if (to_show[i][j].second < table[to_show[i][j].first].size())
-			{
-				lesson comp = table[to_show[i][j].first][to_show[i][j].second];
-				 
-				if (comp.subject.size() > m_subj_size)
-					m_subj_size = comp.subject.size();
-				if (comp.teacher.size() > m_teach_size)
-					m_teach_size = comp.teacher.size();
-				if (comp.room.size() > m_room_size)
-					m_room_size = comp.room.size();
-			}
-		}
-	}
+	std::vector <int> min_sizes = {7,7,4};
+	auto max_sizes = get_max_sizes(to_show, min_sizes);
+	int m_subj_size = max_sizes[0], 
+		m_teach_size = max_sizes[1], 
+		m_room_size = max_sizes[2];
 	/*
 	std::cout << "Max subject size: " << m_subj_size << std::endl
 		<< "Max teacher size: " << m_teach_size << std::endl
@@ -188,7 +199,7 @@ void show_lessons(std::vector < std::vector <std::pair<int, int> >> to_show)
 		for (int i = 0; i<get_largest_row(to_show); i++)
 		{
 			std::cout << construct_table_header(m_subj_size, m_teach_size, m_room_size) 
-				<< " ";
+				<< header_color << "=" << C_OFF;
 		}
 		std::cout << std::endl;
 	}

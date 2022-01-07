@@ -230,7 +230,10 @@ void show_week(int tables_per_row)
 	int day = 0;
 	while (day <= 7)
 	{
-		for (int row = 0; row<timeframes.size(); row++)
+		/* -1 because else show_lessons would print a lesson
+		 * beginning at the end of the last lesson;
+		 */
+		for (int row = 0; row<timeframes.size()-1; row++)
 		{
 				dayarr.push_back(std::vector<std::pair<int,int>>());
 				for (int cell = day; cell<day+tables_per_row; cell++)
@@ -304,11 +307,12 @@ void show_help()
 		<< " set the location of your datafiles.\n"
 		<< "     If these files don't exist, create them.\n"
 		<< "3.   Syntax of your timeframe file:\n"
-		<< "     The timeframe file sets, when your lessons start.\n"
+		<< "     The timeframe file declares when your lessons start.\n"
 		<< "     AT THE MOMENT, PAUSES BETWEEN LESSONS ARE UNFORTUNATELY NOT POSSIBLE.\n"
 		<< "     Between two braces ({}), there is another set of braces for each"
 		<< " timestamp.\n"
 		<< "     In this other set, write the time, separated by a double colon, e.g. 7:45\n"
+		<< "     The last entry is the END of your last lesson, not the beginning.\n"
 		<< "     Example timeframe file:\n"
 		<< std::endl
 		<< "     { # The minutes your lessons start every day\n"
@@ -320,7 +324,7 @@ void show_help()
 		<< "     in which you can write the metadata for as many lessons as you have timeframes.\n"
 		<< "     The metadata is located in more braces and follows this syntax:\n"
 		<< "     {SUBJECT, TEACHER, ROOM}\n"
-		<< "     You can mark free lessons with empty braces without commata [WIP]\n"
+		<< "     You can mark free lessons with empty braces without commata\n"
 		<< "     Example lessondata file:\n"
 		<< "     {\n"
 		<< "        { # Sunday\n"
@@ -330,7 +334,7 @@ void show_help()
 		<< "            { Maths, Smith, 666 } # Maths, with teacher Smith in room 666\n"
 		<< "            {} # An empty lesson\n"
 		<< "            { Computer_Science, Britta_Britt, My_favorite_room } # For spaces, use underscores\n"
-		<< "                 # Underscores are converted to spaces, spaces themselves are not supported\n"
+		<< "                 # Underscores are converted to spaces, underscores themselves are not supported\n"
 		<< "        }\n"
 		<< "     }\n"
 		<< "     You don't need braces for every weekday,\n"
@@ -433,6 +437,8 @@ bool query_reset(std::string file_loc, bool ask) // Ask is true by default
 				 << "\t# lesson-controller still counts it as starting at 7:45 and ending at 8:35, where the second lesson begins." << std::endl
 				 << "\t{9:35} #You can only use numbers, separated by a colon, to denote the timeframes." << std::endl
 				 << "\t{10:35} #You can only have as many lessons in a day (described in your lessondata file) as you have timeframes!" << std::endl
+				 << "\t{11:10} #In the end, you have to put a delimiter, so the last lesson doesn't last forever;" << std::endl
+				 << "# The delimiting lesson is the end of your last lesson, so the last lesson begins at 10:35 and ends at 11:10; A lesson after 11:10 doesn't exist;"
 				 << "}" << std::endl;
 		}
 		else

@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
 	*/
 	 
 	// If there are no arguments, show the week and exit
-	if (argc == 1)
+	if (argc == 1 || (argc == 2 && strcmp(argv[1], "-t") == 0))
 	{
 		show_week(2);
 		return 0;
