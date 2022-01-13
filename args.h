@@ -29,6 +29,9 @@ extern bool print_lessondata_loc;
 void queue_error(std::string message, bool my_write_data = true , std::string my_print_loc = "none");
 void print_errors();
 
+// Debug Helper
+void print_vecvecpair(std::vector<std::vector<std::pair<int,int>>>);
+
 #ifndef NO_COLOR
 	#define C_BLACK		"\033[30m"
 	#define C_RED		"\033[31m"
@@ -75,7 +78,7 @@ int check_timeframe_availability(); // Best name, I know
 
 void rel_lesson(int);
 
-void show_week(); // Show the whole week
+void show_week(int tables_per_row); // Show the whole week
 
 void show_help();
 
