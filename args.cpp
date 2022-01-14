@@ -11,6 +11,7 @@
 #include "timecalc.h"
 #include "args.h"
 
+struct argrules rules;
 
 bool begmatch(const char* arg, const char* check)
 {
@@ -49,18 +50,23 @@ std::vector <std::string> sswitches =
 // Process ALL given arguments
 void process_args(int argc, char *argv[])
 {
-	for (int i = 0; i<argc; i++)
+	/* Track inputs that are not switches, 
+	 * to determine if the whole week should be shown
+	 */
+	int real_args = 0;
+	for (int i = 1; i<argc; i++)
 	{
 		if (begmatch(argv[i], "--"))
 		{
 			// Compare to all long switches
-			int m = vecstrcmp(argv[i], lswitches);
-			std::cout << m << std::endl;
-			switch (m)
+			int entry = vecstrcmp(argv[i], lswitches);
+			if (entry > 4)
+				real_args++;
+			switch (entry)
 			{
 				case ERROR:
 					if (!rules.terse)
-						std::cout << "Argument \"" << argv[i] << "\" not recognized." << std::endl;
+						std::cout << "Switch \"" << argv[i] << "\" not recognized." << std::endl;
 					break;
 				case 0:
 					rules.terse = true;
@@ -76,6 +82,7 @@ void process_args(int argc, char *argv[])
 					break;
 				case 4:
 					rules.color = false;
+					clear_colors();
 					break;
 				case 5:
 					query_reset(LESSON_FILE_LOC, false);
@@ -98,15 +105,104 @@ void process_args(int argc, char *argv[])
 					break;
 				case 11:
 					show_help();
+					break;
+				default:
+					std::cout 
+						<< "A painful problem with lesson controller has occured "
+						<< "which you are not responsible for. Please report this bug to "
+						<< C_GREEN_U
+						<< "https://github.com/Dangertech/lesson-controller/issues" 
+						<< C_OFF
+						<< std::endl;
+					break;
 			}
 		}
-		else if (begmatch(argv[i], "-"))
+										   // Avoid relative lessons (-3)
+		else if (begmatch(argv[i], "-") && !isdigit(argv[i][1]))
 		{
-			 
+			// Compare to all short switches
+			int entry = vecstrcmp(argv[i], sswitches);
+			switch(entry)
+			{
+				case ERROR:
+					std::cout << "Switch \"" << argv[i] << "\" not recognized." << std::endl;
+				case 0:
+					rules.terse = true;
+					break;
+				case 1:
+					rules.count_empties = false;
+					break;
+				case 2:
+					rules.header = false;
+					break;
+				case 3:
+					rules.title = false;
+					break;
+				case 4:
+					rules.color = false;
+					clear_colors();
+					break;
+				case 5:
+					real_args++;
+					show_help();
+					break;
+				default:
+					std::cout 
+						<< "A painful problem with lesson controller has occured "
+						<< "which you are not responsible for. Please report this bug to "
+						<< C_GREEN_U
+						<< "https://github.com/Dangertech/lesson-controller/issues" 
+						<< C_OFF
+						<< std::endl;
+					break;
+			}
 		}
 		else
 		{
+			// Some other argument that isn't a switch
+			real_args++;
+			 
+			// Check weekday
+			char *test_day = argv[i];
+			for (int l = 0; l<strlen(argv[i])-1; l++)
+				test_day[l] = tolower(test_day[l]);
+			if (vecstrcmp(test_day, weekdays) != ERROR)
+			{
+				show_single_day(vecstrcmp(test_day, weekdays));
+				continue;
+			}
+			
+			// Check rellesson
+			if (begmatch(argv[i], "+") || begmatch(argv[i], "-"))
+			{
+				rel_lesson(atoi(argv[i]));
+				continue;
+			}
+			// Check relday through language
+			int relday_check = vecstrcmp(argv[i], {"yesterday", "today", "tomorrow"}) - 1;
+			if (relday_check != ERROR-1)
+			{
+				show_single_day(day + relday_check);
+				continue;
+			}
+			 
+			if (strcmp(argv[i], "0") == 0)
+			{
+				rel_lesson(atoi(argv[i]));
+				continue;
+			}
+			if (strcmp(argv[i], "help") == 0)
+			{
+				show_help();
+				continue;
+			}
 		}
+	}
+	// There were only maybe some switches, show the week
+	if (real_args == 0)
+	{
+		show_week(2);
+		exit(0);
 	}
 }
 
@@ -139,7 +235,7 @@ void print_errors()
 	// Ensure that the function only runs
 	// if there are error messages;
 	// Avoids segfaults
-	if (error_messages.size() == 0 || terse == true)
+	if (error_messages.size() == 0 || rules.terse == true)
 		return;
 	for (int i = 0; i<error_messages.size(); i++)
 	{
@@ -270,7 +366,7 @@ void rel_lesson(int to_skip)
 	{
 		if (to_skip == 0)
 		{
-			if (terse == false)
+			if (rules.terse == false)
 				std::cout << "No active lesson registered." << std::endl;
 			return;
 		}
@@ -311,7 +407,7 @@ void rel_lesson(int to_skip)
 		}
 	}
 	
-	if (terse == false) // Print out the lesson if terse is false
+	if (rules.terse == false) // Print out the lesson if terse is false
 		std::cout << "Lesson " << targeted_lesson + 1 
 			  << " on "
 			  << cap(weekdays[targeted_day]) << ":" << std::endl;
@@ -386,6 +482,8 @@ void show_help()
 		<< "   -C/--no-show-color\t\t\t"
 		<< "don't show the colors set in your config file\n"
 		<< "\t\t\t\t\t\t(to disable ALL colors, you have to recompile with 'CFLAGS=NO_COLOR'\n"
+		<< "   -h/--help\t\t\t\t"
+		<< "show this help text\n"
 		<< std::endl
 		<< std::endl
 		<< std::endl

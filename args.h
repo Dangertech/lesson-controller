@@ -6,14 +6,15 @@
 #include <string>
 #include <vector>
 
-struct rules
+struct argrules
 {
 	bool terse = false,
 		 count_empties = true,
 		 header = true,
 		 title = true,
 		 color = true;
-} rules;
+};
+extern struct argrules rules;
 
 // Actual argument processing
 extern void process_args(int argc, char *argv[]);
