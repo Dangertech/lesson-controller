@@ -24,10 +24,8 @@ extern std::string
 	   header_color,
 	   separator_color;
 
-extern bool title;
 void show_single_day(int);
 
-extern bool table_header; // Track if a table header should be shown
 extern int spacing; // The spacing between the columns
 void show_lessons(std::vector < std::vector <std::pair<int, int>> >); // Show a range of lessons given in the vector of pairs
 // The first item in the pair is the day, the second the lesson

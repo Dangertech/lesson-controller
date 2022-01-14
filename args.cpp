@@ -12,11 +12,108 @@
 #include "args.h"
 
 
-bool terse = false;
-bool count_empties = true;
+bool begmatch(const char* arg, const char* check)
+{
+	if (strncmp(arg, check, strlen(check)) == 0)
+		return true;
+	return false;
+}
 
-// Just testing if it's better to hide the error vector and only 
-// interact with it through functions
+
+std::vector <std::string> lswitches = 
+{ 
+	"--terse", 
+	"--no-count-empties", 
+	"--no-show-header", 
+	"--no-show-title", 
+	"--no-show-color", 
+	"--create", 
+	"--create-lessondata", 
+	"--create-timeframes", 
+	"--reset", 
+	"--reset-lessondata", 
+	"--reset-timeframes",
+	"--help"
+};
+
+std::vector <std::string> sswitches = 
+{
+	"-t", // Terse
+	"-c", // No count empties
+	"-H", // No show header
+	"-T", // No show title
+	"-C", // No show color
+	"-h"  // Show help
+};
+ 
+// Process ALL given arguments
+void process_args(int argc, char *argv[])
+{
+	for (int i = 0; i<argc; i++)
+	{
+		if (begmatch(argv[i], "--"))
+		{
+			// Compare to all long switches
+			int m = vecstrcmp(argv[i], lswitches);
+			std::cout << m << std::endl;
+			switch (m)
+			{
+				case ERROR:
+					if (!rules.terse)
+						std::cout << "Argument \"" << argv[i] << "\" not recognized." << std::endl;
+					break;
+				case 0:
+					rules.terse = true;
+					break;
+				case 1:
+					rules.count_empties = false;
+					break; 
+				case 2:
+					rules.header = false;
+					break;
+				case 3:
+					rules.title = false;
+					break;
+				case 4:
+					rules.color = false;
+					break;
+				case 5:
+					query_reset(LESSON_FILE_LOC, false);
+					query_reset(TIME_FILE_LOC, false);
+					break;
+				case 6:
+					query_reset(LESSON_FILE_LOC, false);
+					break;
+				case 7:
+					query_reset(TIME_FILE_LOC, false);
+				case 8:
+					query_reset(LESSON_FILE_LOC, true);
+					query_reset(TIME_FILE_LOC, true);
+					break;
+				case 9:
+					query_reset(LESSON_FILE_LOC, true);
+					break;
+				case 10: 
+					query_reset(TIME_FILE_LOC, true);
+					break;
+				case 11:
+					show_help();
+			}
+		}
+		else if (begmatch(argv[i], "-"))
+		{
+			 
+		}
+		else
+		{
+		}
+	}
+}
+
+
+
+// Error messages
+
 std::vector < std::string > error_messages;
 void queue_error(std::string message, bool my_write_data, std::string my_print_loc)
 {

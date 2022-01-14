@@ -6,10 +6,17 @@
 #include <string>
 #include <vector>
 
+struct rules
+{
+	bool terse = false,
+		 count_empties = true,
+		 header = true,
+		 title = true,
+		 color = true;
+} rules;
 
-extern bool terse; // Terse output for script processing (Off by default)
-extern bool count_empties; // Should empty lessons in the timetable be counted when parsing? (On by default)
-
+// Actual argument processing
+extern void process_args(int argc, char *argv[]);
 
 // UTILITIES
 
