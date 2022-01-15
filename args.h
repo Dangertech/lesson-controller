@@ -1,6 +1,6 @@
 // This file currently has 3 goals:
-// - Various utilities (also color constants and Stuff)
 // - Process direct arguments
+// - Various utilities (also color constants and Stuff)
 // - Read the config file
 #pragma once
 #include <string>
@@ -18,6 +18,9 @@ extern struct argrules rules;
 
 // Actual argument processing
 extern void process_args(int argc, char *argv[]);
+
+// Gets stuff ing *argv[] for --next/-n argument, calls next() to actually do it
+extern int process_next(int &i, int argc, char *argv[]);
 
 // UTILITIES
 
@@ -84,7 +87,14 @@ std::string tabs(int); // Give a number of tabs
 
 int check_timeframe_availability(); // Best name, I know
 
+// Handles all cases and gets the position of a relative lesson from right now
+std::pair<int,int> get_rel_lesson(int); 
+
+// Wrapper and show_lessons executer for get_rel_lesson
 void rel_lesson(int);
+
+// Search for the next to_skip lesson where subject, teacher or room match the query
+void next(int to_skip, std::string query); 
 
 void show_week(int tables_per_row); // Show the whole week
 

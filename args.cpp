@@ -23,18 +23,24 @@ bool begmatch(const char* arg, const char* check)
 
 std::vector <std::string> lswitches = 
 { 
+	// Change output properties
 	"--terse", 
 	"--no-count-empties", 
 	"--no-show-header", 
 	"--no-show-title", 
 	"--no-show-color", 
+	 
+	// Data management utilities
 	"--create", 
 	"--create-lessondata", 
 	"--create-timeframes", 
 	"--reset", 
 	"--reset-lessondata", 
 	"--reset-timeframes",
-	"--help"
+	"--help",
+
+	// Filters
+	"--next"
 };
 
 std::vector <std::string> sswitches = 
@@ -44,8 +50,10 @@ std::vector <std::string> sswitches =
 	"-H", // No show header
 	"-T", // No show title
 	"-C", // No show color
-	"-h"  // Show help
+	"-h", // Show help
+	"-n"  // --next
 };
+
  
 // Process ALL given arguments
 void process_args(int argc, char *argv[])
@@ -53,15 +61,12 @@ void process_args(int argc, char *argv[])
 	/* Track inputs that are not switches, 
 	 * to determine if the whole week should be shown
 	 */
-	int real_args = 0;
 	for (int i = 1; i<argc; i++)
 	{
 		if (begmatch(argv[i], "--"))
 		{
 			// Compare to all long switches
 			int entry = vecstrcmp(argv[i], lswitches);
-			if (entry > 4)
-				real_args++;
 			switch (entry)
 			{
 				case ERROR:
@@ -106,6 +111,9 @@ void process_args(int argc, char *argv[])
 				case 11:
 					show_help();
 					break;
+				case 12: 
+					process_next(i, argc, argv);
+					break;
 				default:
 					std::cout 
 						<< "A painful problem with lesson controller has occured "
@@ -116,6 +124,8 @@ void process_args(int argc, char *argv[])
 						<< std::endl;
 					break;
 			}
+			if (entry > 4 && entry != ERROR)
+				return;
 		}
 										   // Avoid relative lessons (-3)
 		else if (begmatch(argv[i], "-") && !isdigit(argv[i][1]))
@@ -143,8 +153,12 @@ void process_args(int argc, char *argv[])
 					clear_colors();
 					break;
 				case 5:
-					real_args++;
 					show_help();
+					return;
+					break;
+				case 6:
+					process_next(i, argc, argv);
+					return;
 					break;
 				default:
 					std::cout 
@@ -160,7 +174,6 @@ void process_args(int argc, char *argv[])
 		else
 		{
 			// Some other argument that isn't a switch
-			real_args++;
 			 
 			// Check weekday
 			char *test_day = argv[i];
@@ -169,44 +182,86 @@ void process_args(int argc, char *argv[])
 			if (vecstrcmp(test_day, weekdays) != ERROR)
 			{
 				show_single_day(vecstrcmp(test_day, weekdays));
-				continue;
+				return;
 			}
 			
 			// Check rellesson
 			if (begmatch(argv[i], "+") || begmatch(argv[i], "-"))
 			{
 				rel_lesson(atoi(argv[i]));
-				continue;
+				return;
 			}
 			// Check relday through language
 			int relday_check = vecstrcmp(argv[i], {"yesterday", "today", "tomorrow"}) - 1;
 			if (relday_check != ERROR-1)
 			{
 				show_single_day(day + relday_check);
-				continue;
+				return;
 			}
 			 
 			if (strcmp(argv[i], "0") == 0)
 			{
 				rel_lesson(atoi(argv[i]));
-				continue;
+				return;
 			}
 			if (strcmp(argv[i], "help") == 0)
 			{
 				show_help();
-				continue;
+				return;
 			}
+			if (!rules.terse)
+				std::cout << "Argument \"" << argv[i] << "\" not recognized." << std::endl;
 		}
 	}
-	// There were only maybe some switches, show the week
-	if (real_args == 0)
-	{
-		show_week(2);
-		exit(0);
-	}
+	// Didn't return because of a function execution, show week
+	show_week(2);
 }
 
+int process_next(int &i, int argc, char *argv[])
+{
+	std::string error_msg = 
+		std::string("The \"-n\"/\"--next\" flag requires a subject, teacher or room to look for")
+		+ "and optionally a number for how many matches to skip;\n Example:\n"
+		+ C_GREEN + "lesson --next Physics" + C_OFF + "   => The next physics lesson\n"
+		+ C_GREEN + "lesson --next 3 Schmidt" + C_OFF 
+		+ " => 3rd lesson with teacher Schmidt from now\n";
 
+	if (i+1 < argc)
+	{
+		i++;
+		// Get next skips
+		int next_skips = 0;
+		bool isdig = true;
+		for (int x = 0; x<strlen(argv[i]); x++)
+			if (!isdigit(argv[i][x]))
+				isdig = false;
+		if (isdig)
+			next_skips = atoi(argv[i]);
+		else
+			next_skips = 1; // Search string was put directly in the next arg
+		// Get query
+		std::string query;
+		if (isdig && i+1 < argc)
+		{
+			i++;
+			query = std::string(argv[i]);
+		}
+		else if (!isdig)
+			query = std::string(argv[i]);
+		else
+		{
+			std::cout << error_msg;
+			return ERROR;
+		}
+		next(next_skips, query);
+	}
+	else
+	{
+		std::cout << error_msg;
+		return ERROR;
+	}
+	return 0;
+}
 
 // Error messages
 
@@ -355,7 +410,7 @@ int check_timeframe_availability()
 	return 0;
 }
 
-void rel_lesson(int to_skip)
+std::pair<int,int> get_rel_lesson(int to_skip)
 {
 	int current_lesson = get_lesson(hour, minute);
 	 
@@ -365,11 +420,7 @@ void rel_lesson(int to_skip)
 	else if (current_lesson == -2)
 	{
 		if (to_skip == 0)
-		{
-			if (rules.terse == false)
-				std::cout << "No active lesson registered." << std::endl;
-			return;
-		}
+			return std::make_pair(-1,-1);
 		targeted_lesson = timeframes.size() - 1; 
 	}
 	else
@@ -406,16 +457,30 @@ void rel_lesson(int to_skip)
 				targeted_day = 6;
 		}
 	}
-	
-	if (rules.terse == false) // Print out the lesson if terse is false
-		std::cout << "Lesson " << targeted_lesson + 1 
-			  << " on "
-			  << cap(weekdays[targeted_day]) << ":" << std::endl;
-	 
-	show_lessons({ {{targeted_day, targeted_lesson}} });
+	return std::make_pair(targeted_day, targeted_lesson);
 }
 
+void rel_lesson(int to_skip)
+{
+	std::pair<int,int> table_pos = get_rel_lesson(to_skip); 
+	if (table_pos.first == -1 && table_pos.second == -1)
+	{
+		if (!rules.terse)
+			std::cout << "No active lesson registered." << std::endl;
+		return;
+	}
+	if (rules.terse == false) // Print out the lesson if terse is false
+		std::cout << "Lesson " << table_pos.second + 1 
+			  << " on "
+			  << cap(weekdays[table_pos.first]) << ":" << std::endl;
+	 
+	show_lessons({ {{table_pos.first, table_pos.second}} });
+}
 
+void next(int to_skip, std::string query)
+{
+	std::cout << "Soon, I'll show the next " << to_skip << " lesson with the query \"" << query << "\"!" << std::endl;
+}
 
 void show_week(int tables_per_row)
 {

@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 	get_time(); // Get the current time and write it into the variables
 	int timeread = read_timeframes(); // Read the timeframes from the file specified in lesson.h
 	int lessonread = read_lessondata();
-
+	 
 	if (timeread == ERR_NONEXISTENT_FILE)
 	{
 		queue_error(std::string(C_RED_B) + "There is no timeframe datafile "
@@ -55,8 +55,6 @@ int main(int argc, char *argv[])
 	///// Process arguments
 	process_args(argc, argv);
 	 
-	 
-
 	
 	
 	// Print errors here already, in
@@ -67,7 +65,7 @@ int main(int argc, char *argv[])
 	 
 	if (write_data == true)
 		write_table();
-
+	 
 	print_errors();
 	
 	return 0;
