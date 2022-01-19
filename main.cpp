@@ -6,8 +6,6 @@
 #include "lesson.h"
 #include "args.h"
 
-
-
 int main(int argc, char *argv[])
 {
 	// set the string CONF_FILE_LOC
@@ -39,6 +37,7 @@ int main(int argc, char *argv[])
 			queue_error(std::string(C_RED_B) + "There is no timeframe "
 					+ "for every lesson in the timetable" + std::string(C_OFF));
 	}
+	 
 	if (lessonread == ERR_NONEXISTENT_FILE)
 	{
 		queue_error(std::string(C_RED_B) + "There is no lessondata file "
@@ -54,14 +53,11 @@ int main(int argc, char *argv[])
 	 
 	///// Process arguments
 	process_args(argc, argv);
-	 
-	
 	
 	// Print errors here already, in
 	// case the programe doesn't reach
 	// the end because of an error
 	print_errors();
-	 
 	 
 	if (write_data == true)
 		write_table();

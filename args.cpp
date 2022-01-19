@@ -477,9 +477,46 @@ void rel_lesson(int to_skip)
 	show_lessons({ {{table_pos.first, table_pos.second}} });
 }
 
-void next(int to_skip, std::string query)
+match next(int to_skip, std::string query)
 {
-	std::cout << "Soon, I'll show the next " << to_skip << " lesson with the query \"" << query << "\"!" << std::endl;
+	// TODO: Integrate to_skip
+	int ilesson = get_lesson(hour, minute); // iterator lesson
+	int iday = day;
+	std::cout << ilesson << std::endl;
+	if (ilesson == -1)
+		ilesson = 0;
+	else if (ilesson == -2)
+		ilesson = table[iday].size() -1;
+	int slesson = ilesson; // start lesson for later reference
+	bool stop = false;
+	while (!stop)
+	{
+		if (table[iday].size() > ilesson)
+		{
+			if (table[iday][ilesson].subject == query)
+				return match(m_subj, iday, ilesson);
+			if (table[iday][ilesson].teacher == query)
+				return match(m_teach, iday, ilesson);
+			if (table[iday][ilesson].room == query)
+				return match(m_room, iday, ilesson);
+		}
+		ilesson++;
+		if (ilesson >= table[iday].size())
+		{
+			iday++;
+			ilesson = 0;
+		}
+		if (iday >= 6)
+		{
+			iday = 0;
+			ilesson = 0;
+		}
+		if (ilesson == slesson && iday == day) // Looped around
+			return match(m_none, ERROR, ERROR);
+	}
+	std::cout << "lesson: Could not process --next argument! \
+		Please report at: https://github.com/dangertech/lesson-controller/issues!" << std::endl;
+	return match(m_none, ERROR, ERROR);
 }
 
 void show_week(int tables_per_row)

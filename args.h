@@ -93,8 +93,21 @@ std::pair<int,int> get_rel_lesson(int);
 // Wrapper and show_lessons executer for get_rel_lesson
 void rel_lesson(int);
 
+enum match_enum{m_subj, m_teach, m_room, m_none};
+struct match
+{
+	match_enum match_type;
+	int day;
+	int lesson;
+	match( match_enum my_match_type, int my_day, int my_lesson)
+	{
+		match_type = my_match_type;
+		day = my_day;
+		lesson = my_lesson;
+	}
+};
 // Search for the next to_skip lesson where subject, teacher or room match the query
-void next(int to_skip, std::string query); 
+match next(int to_skip, std::string query); 
 
 void show_week(int tables_per_row); // Show the whole week
 
