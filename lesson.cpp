@@ -20,10 +20,9 @@ std::string
 	separator_color = C_BLUE;
 
 ////// Show a day with some prettifications around it
-bool title = true; // Track if the title (e.g. --- Thursday ---) should be shown
 void show_single_day (int my_day)
 {
-	if (terse == false && title) // Show the requested weekday in a fancy format
+	if (!rules.terse && rules.title) // Show the requested weekday in a fancy format
 	{
 		std::string my_weekday = weekdays[my_day];
 		my_weekday[0] = toupper(my_weekday[0]);
@@ -32,7 +31,7 @@ void show_single_day (int my_day)
 	 
 	if (table[my_day].size() == 0)
 	{
-		if (terse == false)
+		if (rules.terse == false)
 			std::cout << "No lessons registered" << std::endl;
 		return;
 	}
@@ -48,7 +47,6 @@ void show_single_day (int my_day)
 
 // STUFF FOR SHOW_LESSONS
 
-bool table_header = true;
 int spacing = 1;
 
 std::vector<int> get_max_sizes(std::vector < std::vector <std::pair<int,int>> > vec,
@@ -111,7 +109,7 @@ std::string construct_table_header(int subj_size, int teach_size, int room_size)
 std::string sep()
 {
 	std::string sep;
-	if (!terse)
+	if (!rules.terse)
 	{
 		sep += separator_color;
 		for (int i = 0; i<spacing; i++)
@@ -130,21 +128,21 @@ std::string construct_row(lesson l, int subj_size, int teach_size, int room_size
 {
 	std::string row;
 	row += l.subject;
-	if (!terse)
+	if (!rules.terse)
 	{
 		for (int i = row.size(); i<subj_size; i++)
 			row += " ";
 	}
 	row += sep();
 	row += l.teacher;
-	if (!terse)
+	if (!rules.terse)
 	{
 		for (int i = row.size(); i<subj_size+sep().size()+teach_size; i++)
 			row += " ";
 	}
 	row += sep();
 	row += l.room;
-	if (!terse)
+	if (!rules.terse)
 	{
 		for (int i = row.size(); i<subj_size+teach_size+sep().size()*2+room_size+1; i++)
 			row += " ";
@@ -156,14 +154,15 @@ std::string construct_row(lesson l, int subj_size, int teach_size, int room_size
 void show_lessons(std::vector < std::vector <std::pair<int, int> >> to_show)
 {
 	// If it's only a single lesson, you can show a sophisticated info
-	if (to_show.size() == 1 && to_show[0].size() == 1 && !terse)
+	if (to_show.size() == 1 && to_show[0].size() == 1)
 	{
 		int day = to_show[0][0].first, lesson = to_show[0][0].second;
 		if (day > table.size() 
 				|| lesson >= table[day].size())
 		{
-			std::cout << "Lesson " << lesson+1 << " on " 
-				<< cap(weekdays[day]) << " does not exist " << std::endl;
+			if (!rules.terse)
+				std::cout << "Lesson " << lesson+1 << " on " 
+						  << cap(weekdays[day]) << " does not exist " << std::endl;
 			return;
 		}
 	}
@@ -187,7 +186,7 @@ void show_lessons(std::vector < std::vector <std::pair<int, int> >> to_show)
 	*/
 	 
 	// PRINT TABLE HEADERS
-	if (!terse)
+	if (!rules.terse && rules.header)
 	{
 		if (to_show.size() != 0)
 		{
@@ -221,7 +220,7 @@ void show_lessons(std::vector < std::vector <std::pair<int, int> >> to_show)
 		}
 		 
 		std::string time;
-		if (!terse)
+		if (!rules.terse)
 		{
 			time += "[" + hour + ":" + minute + "]";
 			// Make spaces for the maximum size of a time entry,

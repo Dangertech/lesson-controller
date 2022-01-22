@@ -11,12 +11,279 @@
 #include "timecalc.h"
 #include "args.h"
 
+struct argrules rules;
 
-bool terse = false;
-bool count_empties = true;
+bool begmatch(const char* arg, const char* check)
+{
+	if (strncmp(arg, check, strlen(check)) == 0)
+		return true;
+	return false;
+}
 
-// Just testing if it's better to hide the error vector and only 
-// interact with it through functions
+
+std::vector <std::string> lswitches = 
+{ 
+	// Change output properties
+	"--terse", 
+	"--no-count-empties", 
+	"--no-show-header", 
+	"--no-show-title", 
+	"--no-show-color", 
+	 
+	// Data management utilities
+	"--create", 
+	"--create-lessondata", 
+	"--create-timeframes", 
+	"--reset", 
+	"--reset-lessondata", 
+	"--reset-timeframes",
+	"--help",
+
+	// Filters
+	"--next"
+};
+
+std::vector <std::string> sswitches = 
+{
+	"-t", // Terse
+	"-c", // No count empties
+	"-H", // No show header
+	"-T", // No show title
+	"-C", // No show color
+	"-h", // Show help
+	"-n"  // --next
+};
+
+ 
+// Process ALL given arguments
+void process_args(int argc, char *argv[])
+{
+	/* Track inputs that are not switches, 
+	 * to determine if the whole week should be shown
+	 */
+	for (int i = 1; i<argc; i++)
+	{
+		if (begmatch(argv[i], "--"))
+		{
+			// Compare to all long switches
+			int entry = vecstrcmp(argv[i], lswitches);
+			switch (entry)
+			{
+				case ERROR:
+					if (!rules.terse)
+						std::cout << "Switch \"" << argv[i] << "\" not recognized." << std::endl;
+					break;
+				case 0:
+					rules.terse = true;
+					break;
+				case 1:
+					rules.count_empties = false;
+					break; 
+				case 2:
+					rules.header = false;
+					break;
+				case 3:
+					rules.title = false;
+					break;
+				case 4:
+					rules.color = false;
+					clear_colors();
+					break;
+				case 5:
+					query_reset(LESSON_FILE_LOC, false);
+					query_reset(TIME_FILE_LOC, false);
+					break;
+				case 6:
+					query_reset(LESSON_FILE_LOC, false);
+					break;
+				case 7:
+					query_reset(TIME_FILE_LOC, false);
+				case 8:
+					query_reset(LESSON_FILE_LOC, true);
+					query_reset(TIME_FILE_LOC, true);
+					break;
+				case 9:
+					query_reset(LESSON_FILE_LOC, true);
+					break;
+				case 10: 
+					query_reset(TIME_FILE_LOC, true);
+					break;
+				case 11:
+					show_help();
+					break;
+				case 12: 
+					process_next(i, argc, argv);
+					break;
+				default:
+					std::cout 
+						<< "A painful problem with lesson controller has occured "
+						<< "which you are not responsible for. Please report this bug to "
+						<< C_GREEN_U
+						<< "https://github.com/Dangertech/lesson-controller/issues" 
+						<< C_OFF
+						<< std::endl;
+					break;
+			}
+			if (entry > 4 && entry != ERROR)
+				return;
+		}
+										   // Avoid relative lessons (-3)
+		else if (begmatch(argv[i], "-") && !isdigit(argv[i][1]))
+		{
+			// Compare to all short switches
+			int entry = vecstrcmp(argv[i], sswitches);
+			switch(entry)
+			{
+				case ERROR:
+					std::cout << "Switch \"" << argv[i] << "\" not recognized." << std::endl;
+				case 0:
+					rules.terse = true;
+					break;
+				case 1:
+					rules.count_empties = false;
+					break;
+				case 2:
+					rules.header = false;
+					break;
+				case 3:
+					rules.title = false;
+					break;
+				case 4:
+					rules.color = false;
+					clear_colors();
+					break;
+				case 5:
+					show_help();
+					return;
+					break;
+				case 6:
+					process_next(i, argc, argv);
+					return;
+					break;
+				default:
+					std::cout 
+						<< "A painful problem with lesson controller has occured "
+						<< "which you are not responsible for. Please report this bug to "
+						<< C_GREEN_U
+						<< "https://github.com/Dangertech/lesson-controller/issues" 
+						<< C_OFF
+						<< std::endl;
+					break;
+			}
+		}
+		else
+		{
+			// Some other argument that isn't a switch
+			 
+			// Check weekday
+			char *test_day = argv[i];
+			for (int l = 0; l<strlen(argv[i])-1; l++)
+				test_day[l] = tolower(test_day[l]);
+			if (vecstrcmp(test_day, weekdays) != ERROR)
+			{
+				show_single_day(vecstrcmp(test_day, weekdays));
+				return;
+			}
+			
+			// Check rellesson
+			if (begmatch(argv[i], "+") || begmatch(argv[i], "-"))
+			{
+				rel_lesson(atoi(argv[i]));
+				return;
+			}
+			// Check relday through language
+			int relday_check = vecstrcmp(argv[i], {"yesterday", "today", "tomorrow"}) - 1;
+			if (relday_check != ERROR-1)
+			{
+				show_single_day(day + relday_check);
+				return;
+			}
+			 
+			if (strcmp(argv[i], "0") == 0)
+			{
+				rel_lesson(atoi(argv[i]));
+				return;
+			}
+			if (strcmp(argv[i], "help") == 0)
+			{
+				show_help();
+				return;
+			}
+			if (!rules.terse)
+				std::cout << "Argument \"" << argv[i] << "\" not recognized." << std::endl;
+		}
+	}
+	// Didn't return because of a function execution, show week
+	show_week(2);
+}
+
+int process_next(int &i, int argc, char *argv[])
+{
+	std::string error_msg = 
+		std::string("The \"-n\"/\"--next\" flag requires a subject, teacher or room to look for\n")
+		+ "and optionally a number for how many matches to skip;\n Example:\n"
+		+ C_GREEN + "lesson --next Physics" + C_OFF + "   => The next physics lesson\n"
+		+ C_GREEN + "lesson --next 3 Schmidt" + C_OFF 
+		+ " => 3rd lesson with teacher Schmidt from now\n";
+
+	if (i+1 < argc)
+	{
+		i++;
+		// Get next skips
+		int next_skips = 0;
+		bool isdig = true;
+		for (int x = 0; x<strlen(argv[i]); x++)
+			if (!isdigit(argv[i][x]))
+				isdig = false;
+		if (isdig)
+			next_skips = atoi(argv[i]);
+		else
+			next_skips = 1; // Search string was put directly in the next arg
+		// Get query
+		std::string query;
+		if (isdig && i+1 < argc)
+		{
+			i++;
+			query = std::string(argv[i]);
+		}
+		else if (!isdig)
+			query = std::string(argv[i]);
+		else
+		{
+			std::cout << error_msg;
+			return ERROR;
+		}
+		match found = next(next_skips, query);
+		if (!rules.terse)
+		{
+			std::string type;
+			switch (found.match_type)
+			{
+				case 0: type = "subject"; break;
+				case 1: type = "teacher"; break;
+				case 2: type = "room"; break;
+				case 3: type = "NONE!"; break;
+				default: type = "ERROR"; break;
+			}
+			std::cout << "Found " << type << " \"" << query << "\" on " << cap(weekdays[found.day]) 
+				<< ", at lesson " << found.lesson + 1 << std::endl;
+		}
+		else
+		{
+			std::cout << found.match_type << "/" << found.day+1 << "/" << found.lesson+1 << std::endl;
+		}
+		show_lessons({ {{found.day, found.lesson}} });
+	}
+	else
+	{
+		std::cout << error_msg;
+		return ERROR;
+	}
+	return 0;
+}
+
+// Error messages
+
 std::vector < std::string > error_messages;
 void queue_error(std::string message, bool my_write_data, std::string my_print_loc)
 {
@@ -42,7 +309,7 @@ void print_errors()
 	// Ensure that the function only runs
 	// if there are error messages;
 	// Avoids segfaults
-	if (error_messages.size() == 0 || terse == true)
+	if (error_messages.size() == 0 || rules.terse == true)
 		return;
 	for (int i = 0; i<error_messages.size(); i++)
 	{
@@ -162,7 +429,7 @@ int check_timeframe_availability()
 	return 0;
 }
 
-void rel_lesson(int to_skip)
+std::pair<int,int> get_rel_lesson(int to_skip)
 {
 	int current_lesson = get_lesson(hour, minute);
 	 
@@ -172,11 +439,7 @@ void rel_lesson(int to_skip)
 	else if (current_lesson == -2)
 	{
 		if (to_skip == 0)
-		{
-			if (terse == false)
-				std::cout << "No active lesson registered." << std::endl;
-			return;
-		}
+			return std::make_pair(-1,-1);
 		targeted_lesson = timeframes.size() - 1; 
 	}
 	else
@@ -213,16 +476,76 @@ void rel_lesson(int to_skip)
 				targeted_day = 6;
 		}
 	}
-	
-	if (terse == false) // Print out the lesson if terse is false
-		std::cout << "Lesson " << targeted_lesson + 1 
-			  << " on "
-			  << cap(weekdays[targeted_day]) << ":" << std::endl;
-	 
-	show_lessons({ {{targeted_day, targeted_lesson}} });
+	return std::make_pair(targeted_day, targeted_lesson);
 }
 
+void rel_lesson(int to_skip)
+{
+	std::pair<int,int> table_pos = get_rel_lesson(to_skip); 
+	if (table_pos.first == -1 && table_pos.second == -1)
+	{
+		if (!rules.terse)
+			std::cout << "No active lesson registered." << std::endl;
+		return;
+	}
+	if (rules.terse == false) // Print out the lesson if terse is false
+		std::cout << "Lesson " << table_pos.second + 1 
+			  << " on "
+			  << cap(weekdays[table_pos.first]) << ":" << std::endl;
+	 
+	show_lessons({ {{table_pos.first, table_pos.second}} });
+}
 
+match next(int to_skip, std::string query)
+{
+	int ilesson = get_lesson(hour, minute); // iterator lesson
+	int iday = day;
+	if (ilesson == -1)
+		ilesson = 0;
+	else if (ilesson == -2)
+		ilesson = table[iday].size() -1;
+	int slesson = ilesson; // start lesson for later reference
+	bool stop = false;
+	bool matched = false;
+	while (!stop)
+	{
+		if (table[iday].size() > ilesson)
+		{
+			match_enum my_match = m_none;
+			if (table[iday][ilesson].subject == query)
+				my_match = m_subj;
+			if (table[iday][ilesson].teacher == query)
+				my_match = m_teach;
+			if (table[iday][ilesson].room == query)
+				my_match = m_room;
+			 
+			if (my_match != m_none)
+			{
+				matched = true;
+				to_skip--;
+				if (to_skip == 0)
+					return match(my_match, iday, ilesson);
+			}
+		}
+		// Increase iterators
+		ilesson++;
+		if (ilesson >= timeframes.size())
+		{
+			iday++;
+			ilesson = 0;
+		}
+		if (iday > 6)
+		{
+			iday = 0;
+			ilesson = 0;
+		}
+		if (ilesson == slesson && iday == day && !matched) // Looped around without a match yet
+			return match(m_none, ERROR, ERROR);
+	}
+	std::cout << "lesson: Could not process --next argument! \
+		Please report at: https://github.com/dangertech/lesson-controller/issues!" << std::endl;
+	return match(m_none, ERROR, ERROR);
+}
 
 void show_week(int tables_per_row)
 {
@@ -289,6 +612,8 @@ void show_help()
 		<< "   -C/--no-show-color\t\t\t"
 		<< "don't show the colors set in your config file\n"
 		<< "\t\t\t\t\t\t(to disable ALL colors, you have to recompile with 'CFLAGS=NO_COLOR'\n"
+		<< "   -h/--help\t\t\t\t"
+		<< "show this help text\n"
 		<< std::endl
 		<< std::endl
 		<< std::endl
