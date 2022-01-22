@@ -254,7 +254,25 @@ int process_next(int &i, int argc, char *argv[])
 			return ERROR;
 		}
 		match found = next(next_skips, query);
-		std::cout << found.match_type << ", " << found.day << ", " << found.lesson << std::endl;
+		if (!rules.terse)
+		{
+			std::string type;
+			switch (found.match_type)
+			{
+				case 0: type = "subject"; break;
+				case 1: type = "teacher"; break;
+				case 2: type = "room"; break;
+				case 3: type = "NONE!"; break;
+				default: type = "ERROR"; break;
+			}
+			std::cout << "Found " << type << " \"" << query << "\" on " << cap(weekdays[found.day]) 
+				<< ", at lesson " << found.lesson + 1 << std::endl;
+		}
+		else
+		{
+			std::cout << found.match_type << "/" << found.day+1 << "/" << found.lesson+1 << std::endl;
+		}
+		show_lessons({ {{found.day, found.lesson}} });
 	}
 	else
 	{
@@ -521,7 +539,6 @@ match next(int to_skip, std::string query)
 			iday = 0;
 			ilesson = 0;
 		}
-		std::cout << ilesson << " " << slesson << "; " << iday << " " << day << std::endl;
 		if (ilesson == slesson && iday == day && !matched) // Looped around without a match yet
 			return match(m_none, ERROR, ERROR);
 	}
