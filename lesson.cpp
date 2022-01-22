@@ -22,6 +22,8 @@ std::string
 ////// Show a day with some prettifications around it
 void show_single_day (int my_day)
 {
+	my_day = my_day % 7; // Ensure that my_day is in the range of 0 to 6 
+	 
 	if (!rules.terse && rules.title) // Show the requested weekday in a fancy format
 	{
 		std::string my_weekday = weekdays[my_day];

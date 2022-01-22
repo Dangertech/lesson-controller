@@ -254,23 +254,26 @@ int process_next(int &i, int argc, char *argv[])
 			return ERROR;
 		}
 		match found = next(next_skips, query);
-		if (!rules.terse)
+		if (rules.title)
 		{
-			std::string type;
-			switch (found.match_type)
+			if (!rules.terse)
 			{
-				case 0: type = "subject"; break;
-				case 1: type = "teacher"; break;
-				case 2: type = "room"; break;
-				case 3: type = "NONE!"; break;
-				default: type = "ERROR"; break;
+				std::string type;
+				switch (found.match_type)
+				{
+					case 0: type = "subject"; break;
+					case 1: type = "teacher"; break;
+					case 2: type = "room"; break;
+					case 3: type = "NONE!"; break;
+					default: type = "ERROR"; break;
+				}
+				std::cout << "Found " << type << " \"" << query << "\" on " << cap(weekdays[found.day]) 
+					<< ", at lesson " << found.lesson + 1 << std::endl;
 			}
-			std::cout << "Found " << type << " \"" << query << "\" on " << cap(weekdays[found.day]) 
-				<< ", at lesson " << found.lesson + 1 << std::endl;
-		}
-		else
-		{
-			std::cout << found.match_type << "/" << found.day+1 << "/" << found.lesson+1 << std::endl;
+			else
+			{
+				std::cout << found.match_type << "/" << found.day+1 << "/" << found.lesson+1 << std::endl;
+			}
 		}
 		show_lessons({ {{found.day, found.lesson}} });
 	}
@@ -488,7 +491,7 @@ void rel_lesson(int to_skip)
 			std::cout << "No active lesson registered." << std::endl;
 		return;
 	}
-	if (rules.terse == false) // Print out the lesson if terse is false
+	if (!rules.terse && rules.title)
 		std::cout << "Lesson " << table_pos.second + 1 
 			  << " on "
 			  << cap(weekdays[table_pos.first]) << ":" << std::endl;
@@ -590,19 +593,26 @@ void show_help()
 		<< "   lesson -n\t\t\t\t"
 		<< "show the lesson n lessons back of the current one\n"
 		<< "   lesson -d n\t\t\t\t"
-		<< "show the day n days from this one;\n"
+		<< "show the day n days from this one; (WIP!)\n"
 		<< "\t\t\t\t\t\tcan be negative;\n"
 		<< "\t\t\t\t\t\tcan be augmented with a specific lesson number\n"
-		<< "\t\t\t\t\t\t(e.g. lesson -d 3 1 -> First lesson three days ahead)\n"
+		<< "\t\t\t\t\t\t(e.g. lesson -d 3 1 => First lesson three days ahead)\n"
 		<< "   lesson tomorrow/today/yesterday\t" 
 		<< "supported relative weekday displays\n"
+		<< "   lesson --next/-n [n] string\t\t"
+		<< "shows the next n'th lesson where either subject, teacher or room\n"
+		<< "\t\t\t\t\t\tmatch the given string\n"
+		<< "\t\t\t\t\t\t(e.g. lesson --next Geography => next Geography lesson\n"
+		<< "\t\t\t\t\t\t lesson --next 2 Geography => the Geography lesson \n"
+		<< "\t\t\t\t\t\t\tafter the next Geography lesson\n"
+		<< "\t\t\t\t\t\t lesson --next 1 333 => next lesson in the room 333)\n"
 		<< std::endl
 		<< "SWITCHES\n"
 		<< std::endl
 		<< "   -t/--terse\t\t\t\t"
 		<< "makes all output terse, suited for script parsing\n"
-		<< "   -c/--no-count-empties[WIP]\t"
-		<< "relative arguments do not count lessons that don't happen \n"
+		<< "   -c/--no-count-empties\t\t"
+		<< "relative arguments do not count lessons that don't happen (WIP!) \n"
 		<< "\t\t\t\t\t\tbut the timeframes indicate that there might be one\n"
 		<< "   -H/--no-show-header\t\t\t"
 		<< "don't display the header of the timetable\n"
