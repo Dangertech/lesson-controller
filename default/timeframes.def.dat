@@ -1,0 +1,20 @@
+# This is the location where the data about the beginning of your lessons is stored
+# lesson-controller orients itself solely on the BEGINNING of lessons:
+# To calculate when a lesson is taking place, 
+# it uses the timeframe of the beginning of this lesson and the timeframe of the next one.
+# Because of this, you can't mark short breaks between lessons 
+# (though you can mark free lessons by leaving their space empty in the lessondata file)
+# The default timeframe file can be found at 
+# 		https://github.com/Dangertech/lesson-controller
+
+{ # The declaration of your timeframe file has to be enclosed in braces
+	{7:45} # This is the start of the first lesson
+	{8:35} # The beginning of the second lesson
+	# Although there might be a break between the first and the second lesson,
+	# lesson-controller still counts it as starting at 7:45 and 8:35, where the 
+	# second lesson begins.
+	{9:35} # You can only use numbers, separated by a colon to denote the timeframes
+	{10:35} # You can only have as many lessons in a day as you have timeframes!
+	{11:10} # In the end, you have to put a delimiter, so the last lesson doesn't last forever
+	# The delimiting lesson is the end of your last lesson, so the last lesson begins at 10:35 and ends at 11:10; A lesson after 11:10 doesn't exist
+}

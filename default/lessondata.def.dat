@@ -1,0 +1,43 @@
+# This is the location where the data about your lessons is stored.
+# It is designed to be human readable so that you can easily edit it.
+#
+# lesson-controller is space- and linebreak agnostic while reading this
+# and the timeframes.dat file, so you can format it pretty much however you want, BUT:
+# Currently, the file is reset every time the program performs a write operation
+# (Right now, at every successful termination)
+#
+#
+# You have to enclose every day in curly brackets and every lesson in every day as well.
+# The 3 Metadata that are stored (Subject, Teacher and Room) must be separated by commata.
+# You can retrieve the stock configuration in case you messed up at https://github.com/Dangertech/lesson-controller
+                                                                                                                       
+
+{ # This brace marks the beginning of your timetable declaration - it is needed and tells the program to start looking for your table
+	{ # In this level of braces, days are marked. Lesson-controller begins its week with sundays, so these braces mark sunday.
+		#Subject   Teacher  Room
+		{ Religion, Grayson, Church } # This is a lesson on sunday. The subject is "Religion", it is led by the teacher "Grayson" and it happens in the room "Church"
+	}
+	{ # Monday
+		{ English, Hubb, 253 } # This is the first lesson on Monday. A day can contain as many lessons as defined in your time
+		{ French, Lopez, GWZ-17 } # The content you put between these commata can be anything that is a valid ASCII character"
+		{} # You can also leave a lesson empty, the program then recognizes it as free
+		{ History, Bender, 333 }
+	}
+	{ # Tuesday
+		{ Maths, Baerbel, 333 }
+		{           Maths,Baerbel      , 333 } # You can make blank spaces as you wish, they are not recognized and the content will appear without spaces
+		{ Physical_Education, Will_Smith, Sports_Hall } # To make spaces, write underscores instead
+	}
+	{ # Wednesday
+		# A day can also contain zero lessons
+	}
+	{ # Thursday
+
+	}
+	{ # Friday
+
+	}
+	{ # Saturday
+
+	}
+}

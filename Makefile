@@ -16,17 +16,12 @@ default: main.cpp args.cpp lesson.cpp timecalc.cpp
 # For a random user wanting to install the program
 install: main.cpp args.cpp lesson.cpp timecalc.cpp
 	$(CC) -o $(BINNAME) main.cpp timecalc.cpp lesson.cpp args.cpp -I $(IDIR) $(CFLAGS)
-	mkdir $(CONFLOC)
-	touch $(CONFLOC)/config.conf
-	echo "# The lesson-controller configuration file" > $(CONFLOC)/config.conf
-	echo " " >> $(CONFLOC)/config.conf
-	echo "# The location of the lessondata file" >> $(CONFLOC)/config.conf
-	echo "LESSON_FILE_LOC = ~/.config/lesson-controller/lessondata.dat" >> $(CONFLOC)/config.conf
-	echo " " >> $(CONFLOC)/config.conf
-	echo "# The location of the timeframes file" >> $(CONFLOC)/config.conf
-	echo "TIME_FILE_LOC = ~/.config/lesson-controller/timeframes.dat" >> $(CONFLOC)/config.conf
-	 
-	lesson --create
+	sudo cp -f $(BINNAME) /usr/local/bin/
+	sudo chmod 755 /usr/local/bin/$(BINNAME)
+	mkdir -p $(CONFLOC)
+	cp -f ./default/config.def.conf $(CONFLOC)/config.conf
+	cp -f ./default/timeframes.def.dat $(DATALOC)/timeframes.dat
+	cp -f ./default/lessondata.def.dat $(DATALOC)/lessondata.dat
 
 # For resetting all files
 reset: 
@@ -49,3 +44,6 @@ reset:
 	fi
 	 
 	lesson --create
+
+uninstall:
+	sudo rm /usr/local/bin/$(BINNAME)

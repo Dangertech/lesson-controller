@@ -128,25 +128,26 @@ std::string sep()
 
 std::string construct_row(lesson l, int subj_size, int teach_size, int room_size)
 {
+	int scs = subject_color.size(), tcs = teacher_color.size(), rcs = room_color.size(), ocs = std::string(C_OFF).size();
 	std::string row;
-	row += l.subject;
+	row += subject_color + l.subject + C_OFF;
 	if (!rules.terse)
 	{
-		for (int i = row.size(); i<subj_size; i++)
+		for (int i = row.size(); i<subj_size+scs+ocs; i++)
 			row += " ";
 	}
 	row += sep();
-	row += l.teacher;
+	row += teacher_color + l.teacher + C_OFF;
 	if (!rules.terse)
 	{
-		for (int i = row.size(); i<subj_size+sep().size()+teach_size; i++)
+		for (int i = row.size(); i<subj_size+sep().size()+teach_size+scs+tcs+ocs*2; i++)
 			row += " ";
 	}
 	row += sep();
-	row += l.room;
+	row += room_color + l.room + C_OFF;
 	if (!rules.terse)
 	{
-		for (int i = row.size(); i<subj_size+teach_size+sep().size()*2+room_size+1; i++)
+		for (int i = row.size(); i<subj_size+teach_size+sep().size()*2+room_size+1+scs+tcs+rcs+ocs*3; i++)
 			row += " ";
 	}
 	return row;
@@ -224,10 +225,10 @@ void show_lessons(std::vector < std::vector <std::pair<int, int> >> to_show)
 		std::string time;
 		if (!rules.terse)
 		{
-			time += "[" + hour + ":" + minute + "]";
+			time += time_color + "[" + hour + ":" + minute + "]" + C_OFF;
 			// Make spaces for the maximum size of a time entry,
 			// e.g. "[12:55]" has 7 characters
-			for (int s = time.size(); s<7+spacing; s++)
+			for (int s = time.size(); s<7+spacing+time_color.size()+std::string(C_OFF).size(); s++)
 				time += " ";
 			time += separator_color + "|" + C_OFF;
 			for (int s = 0; s<spacing; s++)
