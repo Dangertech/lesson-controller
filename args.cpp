@@ -220,7 +220,7 @@ void process_args(int argc, char *argv[])
 int process_next(int &i, int argc, char *argv[])
 {
 	std::string error_msg = 
-		std::string("The \"-n\"/\"--next\" flag requires a subject, teacher or room to look for")
+		std::string("The \"-n\"/\"--next\" flag requires a subject, teacher or room to look for\n")
 		+ "and optionally a number for how many matches to skip;\n Example:\n"
 		+ C_GREEN + "lesson --next Physics" + C_OFF + "   => The next physics lesson\n"
 		+ C_GREEN + "lesson --next 3 Schmidt" + C_OFF 
@@ -253,7 +253,8 @@ int process_next(int &i, int argc, char *argv[])
 			std::cout << error_msg;
 			return ERROR;
 		}
-		next(next_skips, query);
+		match found = next(next_skips, query);
+		std::cout << found.match_type << ", " << found.day << ", " << found.lesson << std::endl;
 	}
 	else
 	{
@@ -479,39 +480,49 @@ void rel_lesson(int to_skip)
 
 match next(int to_skip, std::string query)
 {
-	// TODO: Integrate to_skip
 	int ilesson = get_lesson(hour, minute); // iterator lesson
 	int iday = day;
-	std::cout << ilesson << std::endl;
 	if (ilesson == -1)
 		ilesson = 0;
 	else if (ilesson == -2)
 		ilesson = table[iday].size() -1;
 	int slesson = ilesson; // start lesson for later reference
 	bool stop = false;
+	bool matched = false;
 	while (!stop)
 	{
 		if (table[iday].size() > ilesson)
 		{
+			match_enum my_match = m_none;
 			if (table[iday][ilesson].subject == query)
-				return match(m_subj, iday, ilesson);
+				my_match = m_subj;
 			if (table[iday][ilesson].teacher == query)
-				return match(m_teach, iday, ilesson);
+				my_match = m_teach;
 			if (table[iday][ilesson].room == query)
-				return match(m_room, iday, ilesson);
+				my_match = m_room;
+			 
+			if (my_match != m_none)
+			{
+				matched = true;
+				to_skip--;
+				if (to_skip == 0)
+					return match(my_match, iday, ilesson);
+			}
 		}
+		// Increase iterators
 		ilesson++;
-		if (ilesson >= table[iday].size())
+		if (ilesson >= timeframes.size())
 		{
 			iday++;
 			ilesson = 0;
 		}
-		if (iday >= 6)
+		if (iday > 6)
 		{
 			iday = 0;
 			ilesson = 0;
 		}
-		if (ilesson == slesson && iday == day) // Looped around
+		std::cout << ilesson << " " << slesson << "; " << iday << " " << day << std::endl;
+		if (ilesson == slesson && iday == day && !matched) // Looped around without a match yet
 			return match(m_none, ERROR, ERROR);
 	}
 	std::cout << "lesson: Could not process --next argument! \
