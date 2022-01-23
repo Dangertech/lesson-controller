@@ -425,7 +425,7 @@ int read_timeframes()
 			queue_error(std::string(C_RED_B) + "Your timeframe file contains "
 						+ "characters in the time location that are not numbers.\n"
 						+ std::string(C_OFF) + "Advice:\n\t- Edit your timeframe file\n"
-						+ "\t- Issue 'lesson --reset-timeframes' (Your data will be lost)",
+						+ "\t- View https://github.com/Dangertech/lesson-controller/blob/main/default/timeframes.def.dat to get info on how to edit the timeframe file",
 						false, "timeframes");
 		}
 		timefile.close();

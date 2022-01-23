@@ -389,8 +389,7 @@ int check_timeframe_availability()
 		queue_error(std::string(C_RED_B)
 				+ "There are no timeframes set! Check that your "
 				+ "config file points to your timeframe file.\n"
-				+ "You can reset the timeframe file with " 
-				+ std::string(C_OFF) + "lesson --reset-timeframes "
+				+ "View " + C_OFF + "https://github.com/Dangertech/lesson-controller/blob/main/default/timeframes.def.dat"
 				+ std::string(C_RED_B) + "\nto learn about how your "
 				+ "file should look like.", true, "timeframes");
 		print_errors();

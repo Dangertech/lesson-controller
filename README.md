@@ -26,7 +26,7 @@ There are some switches which modify output, an example of which can be seen her
 
 Also, lesson-controller is themable! You can configure the theme in the config file.
 
-## Install and config
+## Build.
 `cd` whereever you keep your git clones and execute the following (explicitely DO NOT make with sudo):
 
 
@@ -34,6 +34,7 @@ Also, lesson-controller is themable! You can configure the theme in the config f
     make install
 
 
+## Configure.
 This adds an executable called `lesson` to `/usr/local/bin` and creates the director `~/.config/lesson-controller`.
 Move into this directory:
 
@@ -41,9 +42,16 @@ Move into this directory:
 
 There, you should be able to see three files: `config.conf`, `timeframes.dat`, `lessondata.dat`. If you
 peek into these files, you can see a tutorial on what they do and how you have to customize each of them. 
-Just follow them and pluck your own timetable in there.
+Just follow them and pluck your own timetable in there. **Note that if you executed `lesson` before
+opening the files, the comments are gone; In that case, run `make install` again.**
 
 If you do have problems with this process or have ideas on how to improve it, 
 please [open an issue](https://github.com/dangertech/lesson-controller/issues/new).
 
 To get information on how to use lesson-controller in detail, call `lesson --help`.
+
+## Additional.
+The Makefile knows to other targets: `reset` and `uninstall`. `uninstall` simply removes the binary
+but does not modify your config location. `reset` cleans your confloc and dataloc and puts in the defaults
+again. This is useful if you want to quickly reset the configuration. Run `make` without anything to build
+the binary in the current directory.

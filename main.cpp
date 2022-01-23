@@ -26,9 +26,9 @@ int main(int argc, char *argv[])
 	{
 		queue_error(std::string(C_RED_B) + "There is no timeframe datafile "
 								+ "at your data location given in the config file;\n"
-								+ "Please create one using "
-								+ std::string(C_OFF) + "lesson --create-timeframes "
-								+ std::string(C_RED_B) + "or change the location in your "
+								+ "Please create one by putting the default file found at\n"
+								+ C_OFF + "https://github.com/dangertech/lesson-controller" + C_RED_B
+								+ "there or changing the location in your "
 								+ "config file to the appropriate one;" 
 								+ std::string(C_OFF), true, "timeframes");
 	}
@@ -42,9 +42,9 @@ int main(int argc, char *argv[])
 	{
 		queue_error(std::string(C_RED_B) + "There is no lessondata file "
 					+ "at your data location given in the config file;\n"
-					+ "Please create one using "
-					+ std::string(C_OFF) + "lesson --create-datafile "
-					+ std::string(C_RED_B) + "or change the location in your "
+					+ "Please create one by putting the default file found at\n"
+					+ C_OFF + "https://github.com/dangertech/lesson-controller" + C_RED_B
+					+ "there or changing the location in your "
 					+ "config file to the appropriate one;"
 					+ std::string(C_OFF), true, "lessondata");
 	}

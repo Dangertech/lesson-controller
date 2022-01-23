@@ -29,21 +29,16 @@ reset:
 	- rm -r $(CONFLOC)
 	- rm -r $(DATALOC)
 	mkdir $(CONFLOC)
-	# Replace with lesson --create-config
-	touch $(CONFLOC)/config.conf
-	echo "# The lesson-controller configuration file" > $(CONFLOC)/config.conf
-	echo " " >> $(CONFLOC)/config.conf
-	echo "# The location of the lessondata file" >> $(CONFLOC)/config.conf
-	echo "LESSON_FILE_LOC = ~/.config/lesson-controller/lessondata.dat" >> $(CONFLOC)/config.conf
-	echo " " >> $(CONFLOC)/config.conf
-	echo "# The location of the timeframes file" >> $(CONFLOC)/config.conf
-	echo "TIME_FILE_LOC = ~/.config/lesson-controller/timeframes.dat" >> $(CONFLOC)/config.conf
+	 
+	cp -f ./default/config.def.conf $(CONFLOC)/config.conf
+	 
 	 
 	if [ ! -d $(DATALOC) ]; then \
 		mkdir $(DATALOC); \
 	fi
+	cp -f ./default/timeframes.def.dat $(DATALOC)/timeframes.dat
+	cp -f ./default/lessondata.def.dat $(DATALOC)/lessondata.dat
 	 
-	lesson --create
 
 uninstall:
 	sudo rm /usr/local/bin/$(BINNAME)
