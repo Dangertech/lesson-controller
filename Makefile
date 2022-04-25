@@ -7,17 +7,24 @@ CONFLOC=~/.config/lesson-controller
 DATALOC=$(CONFLOC)
 BINNAME=lesson
 
+SRC=main.cpp args.cpp lesson.cpp timecalc.cpp
+OBJ=main.o args.o lesson.o timecalc.o
+
 SHELL=/bin/bash # Don't change that!
 
 # For steady recompilation of the binary
-default: main.cpp args.cpp lesson.cpp timecalc.cpp
-	$(CC) -o $(BINNAME) main.cpp timecalc.cpp lesson.cpp args.cpp -I $(IDIR) $(CFLAGS)
+default: compile link
+
+compile: $(SRC)
+	$(CC) -c $(SRC) $(CFLAGS)
+
+link:  $(OBJ)
+	$(CC) -o $(BINNAME) $(OBJ) $(CFLAGS)
 
 # For a random user wanting to install the program
-install: main.cpp args.cpp lesson.cpp timecalc.cpp
-	$(CC) -o $(BINNAME) main.cpp timecalc.cpp lesson.cpp args.cpp -I $(IDIR) $(CFLAGS)
-	sudo cp -f $(BINNAME) /usr/local/bin/
-	sudo chmod 755 /usr/local/bin/$(BINNAME)
+install: $(BINNAME)
+	cp -f $(BINNAME) /usr/local/bin/
+	chmod 755 /usr/local/bin/$(BINNAME)
 	mkdir -p $(CONFLOC)
 	cp -f ./default/config.def.conf $(CONFLOC)/config.conf
 	cp -f ./default/timeframes.def.dat $(DATALOC)/timeframes.dat
@@ -41,4 +48,7 @@ reset:
 	 
 
 uninstall:
-	sudo rm /usr/local/bin/$(BINNAME)
+	rm /usr/local/bin/$(BINNAME)
+
+clean:
+	rm $(OBJ) $(BINNAME)
